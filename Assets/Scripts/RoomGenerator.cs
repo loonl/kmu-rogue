@@ -1,6 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
+
+public enum RoomType
+{
+    Default = 1,
+    Moss = 2,
+    Vine = 3,
+    MossVine = 4
+}
 
 public enum RoomDirect
 {
@@ -20,7 +27,7 @@ public class RoomGenerator : MonoBehaviour
     private GameObject roomParent;
 
     [SerializeField]
-    private GameObject groundPref;
+    private GameObject tempRoomPref;
     [SerializeField]
     private GameObject wallPref;
     [SerializeField]
@@ -47,7 +54,7 @@ public class RoomGenerator : MonoBehaviour
     // -------------------------------------------------------------
     // 던전 생성, 초기화
     // -------------------------------------------------------------
-    public void Generate(int maxCount = 25)
+    public void Generate(int maxCount = 10)
     {
         roomCount = 0;
         maxRoomCount = maxCount;
@@ -55,7 +62,8 @@ public class RoomGenerator : MonoBehaviour
         Room selectRoom = new Room();       // 시작 방 생성
         rooms.Add(selectRoom);
         visitedRooms.Push(selectRoom);
-        GameObject initRoomObj = Instantiate(groundPref, this.transform.position, Quaternion.identity);
+        GameObject initRoomObj = Instantiate(tempRoomPref, this.transform.position, Quaternion.identity);
+        initRoomObj.transform.parent = roomParent.transform;
         initRoomObj.name = roomCount.ToString();
         selectRoom.SetRoomObject(initRoomObj);
         roomCount += 1;
@@ -81,9 +89,9 @@ public class RoomGenerator : MonoBehaviour
                 ConnectNearRoom(newRoom);
 
                 // Room 좌표 위치에 groundPref 생성
-                Vector3 roomPos = new Vector3(newRoom.X, 0f, newRoom.Y) * roomWidth;
+                Vector3 roomPos = new Vector3(newRoom.X, newRoom.Y, 0f) * roomWidth;
                 // newRoom.SetRoomObject(Instantiate(groundPref, roomPos, Quaternion.identity));
-                GameObject newRoomObj = Instantiate(groundPref, roomPos, Quaternion.identity);
+                GameObject newRoomObj = Instantiate(tempRoomPref, roomPos, Quaternion.identity);
                 newRoomObj.transform.parent = roomParent.transform;
                 newRoomObj.name = roomCount.ToString();
                 newRoom.SetRoomObject(newRoomObj);
