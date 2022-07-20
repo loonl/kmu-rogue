@@ -6,6 +6,6 @@ public class Zombie : Monster
         maxHealth = 100f;
         health = 100f;
         damage = 20f;
-        speed = 5f;
+        speed = 1f;
     }
 }

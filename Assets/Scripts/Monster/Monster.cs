@@ -8,6 +8,7 @@ public class Monster : Entity
     public AudioClip deathSound; // 사망시 재생할 소리
     public AudioClip hitSound; // 피격시 재생할 소리
 
+    protected Rigidbody2D rigidbody2d; // 리지드바디 컴포넌트
     protected Animator animator; // 애니메이터 컴포넌트
     protected AudioSource audioPlayer; // 오디오 소스 컴포넌트
 
@@ -33,6 +34,7 @@ public class Monster : Entity
     private void Awake()
     {
         // 컴포넌트 초기화
+        rigidbody2d = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         audioPlayer = GetComponent<AudioSource>();
     }
@@ -41,26 +43,32 @@ public class Monster : Entity
     {
         // 몬스터의 스텟 초기화
         Setup();
-
-        // 몬스터 생성과 동시에 AI의 추적 루틴 시작
-        StartCoroutine(UpdatePath());
     }
 
     private void Update()
     {
         // 추적 대상의 존재 여부에 따라 다른 애니메이션을 재생
         animator.SetBool("HasTarget", hasTarget);
-    }
 
+        // 주기적으로 추적할 대상의 위치를 찾아 경로를 갱신
+        UpdatePath();
+    }
 
     // 주기적으로 추적할 대상의 위치를 찾아 경로를 갱신
-    private IEnumerator UpdatePath()
+    protected void UpdatePath()
     {
-            // 추적 알고리즘 추가
-            yield return new WaitForSeconds(0.25f);
+        if (hasTarget)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, targetEntity.transform.position, speed * Time.deltaTime);
+        }
+        else
+        {
+            rigidbody2d.velocity = Vector2.zero;
+            targetEntity = GameObject.FindGameObjectWithTag("Player").GetComponent<Entity>();
+        }
     }
 
-    // 데미지를 입었을때 실행할 처리
+    // 피격 처리
     public override void OnDamage(float damage)
     {
         if (!dead)
