@@ -116,6 +116,8 @@ public class Monster : Entity
 
     private void OnTriggerStay(Collider other)
     {
+        Debug.Log(other);
+        
         if (dead)
         {
             return;
