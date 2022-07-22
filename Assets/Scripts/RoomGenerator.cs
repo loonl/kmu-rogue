@@ -90,11 +90,9 @@ public class RoomGenerator : MonoBehaviour
     [SerializeField]
     private GameObject emptyRoomPref;
     
-    // 방 생성을 위함
     private List<Room> rooms;            // 모든 방 리스트
     private Stack<Room> visitedRooms;
-    private List<GameObject> walls;
-    private List<GameObject> doors;
+    private List<DungeonRoom> dungeonRooms;
 
     public List<Room> Rooms { get { return rooms; } }
     
@@ -105,8 +103,7 @@ public class RoomGenerator : MonoBehaviour
         roomWidth = 20;
         rooms = new List<Room>();
         visitedRooms = new Stack<Room>();
-        walls = new List<GameObject>();
-        doors = new List<GameObject>();
+        dungeonRooms = new List<DungeonRoom>();
     }
 
     // -------------------------------------------------------------
@@ -138,6 +135,21 @@ public class RoomGenerator : MonoBehaviour
         DrawDoors(rooms);
     }
 
+    public void Clear()
+    {
+        // 생성된 모든 room object 삭제
+        foreach (DungeonRoom room in dungeonRooms)
+        {
+            Destroy(room.gameObject);
+        }
+
+        // 초기화
+        dungeonRooms.Clear();
+        roomCount = 0;
+        rooms.Clear();
+        visitedRooms.Clear();
+    }
+
     private void CreateEmptyRoom(int maxCount = 10)
     {
         roomCount = 0;
@@ -147,6 +159,7 @@ public class RoomGenerator : MonoBehaviour
         rooms.Add(selectRoom);
         visitedRooms.Push(selectRoom);
         GameObject initRoomObj = Instantiate(emptyRoomPref, this.transform.position, Quaternion.identity);
+        dungeonRooms.Add(initRoomObj.GetComponent<DungeonRoom>());
         initRoomObj.transform.parent = roomParent.transform;
         initRoomObj.name = roomCount.ToString();
         selectRoom.SetRoomObject(initRoomObj);
@@ -176,6 +189,7 @@ public class RoomGenerator : MonoBehaviour
                 Vector3 roomPos = new Vector3(newRoom.X, newRoom.Y, 0f) * roomWidth;
                 // newRoom.SetRoomObject(Instantiate(groundPref, roomPos, Quaternion.identity));
                 GameObject newRoomObj = Instantiate(emptyRoomPref, roomPos, Quaternion.identity);
+                dungeonRooms.Add(newRoomObj.GetComponent<DungeonRoom>());
                 newRoomObj.transform.parent = roomParent.transform;
                 newRoomObj.name = roomCount.ToString();
                 newRoom.SetRoomObject(newRoomObj);
@@ -186,20 +200,6 @@ public class RoomGenerator : MonoBehaviour
                 roomCount += 1;
             }
         }
-    }
-
-    public void Clear()
-    {
-        // 생성된 모든 room object 삭제
-        foreach (Room room in rooms)
-        {
-            Destroy(room.RoomObject);
-        }
-
-        // 초기화
-        roomCount = 0;
-        rooms.Clear();
-        visitedRooms.Clear();
     }
 
     private void ConnectNearRoom(Room newRoom)
@@ -289,7 +289,6 @@ public class RoomGenerator : MonoBehaviour
         }
 
         // 방 크기에 맞추어 정 가운데로 정렬
-        room.TileMapParent.transform.localPosition = new Vector3(roomWidth / 2.0f, roomWidth / 2.0f, 0);
         Vector3 tileMapSize = new Vector3(room.WallLayer.size.x, room.WallLayer.size.y, 0f);
         room.TileMapParent.transform.localPosition -= tileMapSize * room.WallLayer.cellSize.x * 0.5f;
     }
@@ -324,102 +323,6 @@ public class RoomGenerator : MonoBehaviour
                 }
             }
         }
-    }
-
-    // 벽 생성
-    public void GenerateWalls()
-    {
-        float roomRadius = roomWidth / 2f;
-        // foreach(Room room in rooms)
-        // {
-        //     foreach(RoomDirect direct in room.EmptyDirects)
-        //     {
-        //         // 인접한 방이 없는 곳에 벽 생성
-        //         GameObject wall = Instantiate(wallPref);
-        //         wall.transform.parent = roomParent.transform;
-        //         Vector3 offset = Vector3.zero;
-
-        //         switch (direct)
-        //         {
-        //             case RoomDirect.Top:
-        //                 offset += new Vector3(0f, 0f, roomRadius);
-        //                 break;
-        //             case RoomDirect.Right:
-        //                 offset += new Vector3(roomRadius, 0f, 0f);
-        //                 wall.transform.rotation = Quaternion.Euler(new Vector3(0f, 180f, 0f));
-        //                 break;
-        //             case RoomDirect.Down:
-        //                 offset += new Vector3(0f, 0f, -1 * roomRadius);
-        //                 wall.transform.rotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
-        //                 break;
-        //             case RoomDirect.Left:
-        //                 offset += new Vector3(-1 * roomRadius, 0f, 0f);
-        //                 wall.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
-        //                 break;
-        //         }
-
-        //         wall.transform.position = new Vector3(
-        //             room.X * roomWidth,
-        //             wall.transform.position.y,
-        //             room.Y * roomWidth
-        //         ) + offset;
-
-        //         walls.Add(wall);
-        //     }
-
-        //     // foreach(RoomDirect direct in room.ExistDirects)
-        //     // {
-        //     //     // 인접한 방이 있는 곳에 문 생성
-        //     //     GameObject door = Instantiate(doorPref);
-        //     //     Vector3 offset = Vector3.zero;
-
-        //     //     switch (direct)
-        //     //     {
-        //     //         case RoomDirect.Top:
-        //     //             offset += new Vector3(0f, 0f, roomRadius);
-        //     //             room.Top.ExistDirects.Remove(RoomDirect.Down);
-        //     //             break;
-        //     //         case RoomDirect.Right:
-        //     //             offset += new Vector3(roomRadius, 0f, 0f);
-        //     //             // door.transform.rotation = Quaternion.Euler(new Vector3(0f, 90f, 0f));
-        //     //             room.Right.ExistDirects.Remove(RoomDirect.Left);
-        //     //             break;
-        //     //         case RoomDirect.Down:
-        //     //             offset += new Vector3(0f, 0f, -1 * roomRadius);
-        //     //             room.Down.ExistDirects.Remove(RoomDirect.Top);
-        //     //             break;
-        //     //         case RoomDirect.Left:
-        //     //             offset += new Vector3(-1 * roomRadius, 0f, 0f);
-        //     //             // door.transform.rotation = Quaternion.Euler(new Vector3(0f, 90f, 0f));
-        //     //             room.Left.ExistDirects.Remove(RoomDirect.Right);
-        //     //             break;
-        //     //     }
-
-        //     //     door.transform.position = new Vector3(
-        //     //         room.X * roomWidth,
-        //     //         door.transform.position.y,
-        //     //         room.Y * roomWidth
-        //     //     ) + offset;
-
-        //     //     doors.Add(door);
-        //     // }
-        // }
-    }
-
-    // 모든 벽 제거
-    public void ClearWalls()
-    {
-        for (int i = 0; i < walls.Count; i++)
-        {
-            Destroy(walls[i]);
-        }
-        walls.Clear();
-
-        for (int i = 0; i < doors.Count; i++)
-        {
-            Destroy(doors[i]);
-        }
-        doors.Clear();
     }
 
     private void DrawTile(Tilemap tileMap, TileType type, TileDirect direct, Vector3Int pos)
@@ -485,10 +388,6 @@ public class RoomGenerator : MonoBehaviour
             case 28:
                 // All doors
                 tile = allDoors[(ushort)type % 21];
-                break;
-
-            default:
-                tile = null;
                 break;
         }
 

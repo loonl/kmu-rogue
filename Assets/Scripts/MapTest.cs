@@ -10,6 +10,10 @@ public class MapTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            dungeonSystem.ClearDungeon();
+        }
         if (Input.GetKeyDown(KeyCode.Space))
         {
             dungeonSystem.ClearDungeon();
