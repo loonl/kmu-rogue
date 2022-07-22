@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : Entity {
-    // ÀÌµ¿ ¼Óµµ Á¶ÀýÇÏ´Â º¯¼ö
+    // ï¿½Ìµï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½
     public float speed;
     public float damage;
     public bool isAttacking;
@@ -14,22 +14,22 @@ public class Player : Entity {
     {
         anim = transform.GetChild(0).gameObject.GetComponent<Animator>();
 
-        // ¾Ö´Ï¸ÞÀÌÅÍÀÇ ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ ³¡³ª¸é È£ÃâÇÒ ÇÔ¼öµé Á¤ÀÇ - Die
+        // ï¿½Ö´Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ - Die
         anim.GetComponent<PlayerAnimreciver>().onDieComplete = () =>
         {
-            // Die ¾Ö´Ï¸ÞÀÌ¼Ç Ãâ·ÂÀÌ ³¡³ª¸é ºñÈ°¼ºÈ­
+            // Die ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­
             gameObject.SetActive(false);
         };
 
-        // ¾Ö´Ï¸ÞÀÌÅÍÀÇ ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ ³¡³ª¸é È£ÃâÇÒ ÇÔ¼ö Á¤ÀÇ - Attack
+        // ï¿½Ö´Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½ - Attack
         anim.GetComponent<PlayerAnimreciver>().onAttackComplete = () =>
         {
-            // Attack ¾Ö´Ï¸ÞÀÌ¼Ç Ãâ·ÂÀÌ ³¡³ª¸é Àç°ø°Ý °¡´ÉÇÏ°Ô º¯È¯
+            // Attack ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½È¯
             isAttacking = false;
         };
 
 
-        // ÃÊ±â º¯¼ö ¼¼ÆÃ
+        // ï¿½Ê±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         maxHealth = 100.0f;
         health = maxHealth;
         damage = 25.0f;
@@ -38,15 +38,15 @@ public class Player : Entity {
 
     void Update()
     {
-        // Á×¾úÀ¸¸é input ¾È ¹Þ°Ô
+        // ï¿½×¾ï¿½ï¿½ï¿½ï¿½ï¿½ input ï¿½ï¿½ ï¿½Þ°ï¿½
         if (dead)
             return;
 
-        // »óÇÏÁÂ¿ì ¿òÁ÷ÀÓ input °¡Á®¿À±â
-        // ´ë°¢¼± ±æÀÌµµ 1·Î ¸ÂÃçÁÖ±â À§ÇØ¼­ normalize
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Â¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ input ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // ï¿½ë°¢ï¿½ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ 1ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ ï¿½ï¿½ï¿½Ø¼ï¿½ normalize
         Vector3 moveInput = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0).normalized;
 
-        // ÁÂ¿ì ÀÌµ¿¿¡ µû¶ó Ä³¸¯ÅÍ µÚÁý¾îÁÖ±â
+        // ï¿½Â¿ï¿½ ï¿½Ìµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½
         if (moveInput.x >
             0 && transform.localScale.x > 0)
         {
@@ -57,15 +57,15 @@ public class Player : Entity {
             transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
         }
 
-        // »óÇÏÁÂ¿ì ¿òÁ÷ÀÓ Á¶Àý
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Â¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         transform.position += moveInput * Time.deltaTime * speed;
 
-        // ¾Ö´Ï¸ÞÀÌ¼Ç º¯°æ
+        // ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½
         anim.SetFloat("Speed", moveInput.magnitude);
 
         if (Input.GetButtonDown("Fire1") && !isAttacking)
         {
-            // ¾Ö´Ï¸ÞÀÌ¼Ç AttackÀ¸·Î º¯°æ
+            // ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ Attackï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             anim.SetTrigger("Attack");
             isAttacking = true;
         }
@@ -79,28 +79,28 @@ public class Player : Entity {
 
     }
 
-    // ÇÇ°Ý Ã³¸®
+    // ï¿½Ç°ï¿½ Ã³ï¿½ï¿½
     public override void OnDamage(float damage)
     {
         base.OnDamage(damage);
 
-        // Ã¼·ÂÀÌ À½¼ö¸é 0À¸·Î Á¶Á¤
+        // Ã¼ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (health < 0f)
             health = 0f;
 
-        // ¾Ö´Ï¸ÞÀÌ¼Ç Stunned·Î º¯°æ
+        // ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ Stunnedï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         anim.SetTrigger("Hit");
 
         // debug
         print(health);
     }
 
-    // »ç¸Á Ã³¸®
+    // ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     public override void Die()
     {
         base.Die();
 
-        // ¾Ö´Ï¸ÞÀÌ¼Ç Death·Î º¯°æ
+        // ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ Deathï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         anim.SetTrigger("Die");
     }
 }

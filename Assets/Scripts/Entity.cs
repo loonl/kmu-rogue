@@ -25,7 +25,8 @@ public class Entity : MonoBehaviour {
     }
 
     // 사망 처리
-    public virtual void Die() {
+    public virtual void Die() 
+    {
         if (onDeath != null)
         {
             onDeath();
