@@ -169,6 +169,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomParent: {fileID: 1876736020}
+  allDoors:
+  - {fileID: 11400000, guid: 923b96e1c883a034aa384ede5b414e99, type: 2}
+  - {fileID: 11400000, guid: 28de7159de68e9244be90c31c71b050c, type: 2}
+  - {fileID: 11400000, guid: 82072b2a7ee026342ad3663bf4379fd7, type: 2}
+  - {fileID: 11400000, guid: 759e3e55febacf2458b1702a44e0a47d, type: 2}
+  - {fileID: 11400000, guid: 75a39ad7d0051f441b6c25d76e64f3f7, type: 2}
+  - {fileID: 11400000, guid: 69dd5839bd4c49545a0fd5626055603d, type: 2}
+  - {fileID: 11400000, guid: 2f7a270f0b3975c41b429e9406582121, type: 2}
+  - {fileID: 11400000, guid: 0c92a14ebe414ee49aa2f9e5a0a88ede, type: 2}
   defaultGrounds:
   - {fileID: 11400000, guid: cc39ebed65b937c4db602bcdb840dab6, type: 2}
   - {fileID: 11400000, guid: 224a2409ebb5b6144aadb401ec603ba3, type: 2}
@@ -377,7 +386,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   generator: {fileID: 354858252}
-  tempRoomCount: 1
+  tempRoomCount: 15
 --- !u!4 &718270245
 Transform:
   m_ObjectHideFlags: 0
@@ -667,7 +676,7 @@ LightingSettings:
   m_PVRFilteringAtrousPositionSigmaIndirect: 2
   m_PVRFilteringAtrousPositionSigmaAO: 1
   m_PVRTiledBaking: 0
---- !u!1001 &8579086445853496022
+--- !u!1001 &7053189702384465760
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2

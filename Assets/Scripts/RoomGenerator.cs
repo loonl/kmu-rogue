@@ -25,6 +25,14 @@ public enum TileType
     VineMossWaterGround = 18,
     VineMossWaterWall = 19,
     VineMossWaterEdge = 20,
+    DefaultOpenDoor = 21,
+    DefaultCloseDoor = 22,
+    MossOpenDoor = 23,
+    MossCloseDoor = 24,
+    VineOpenDoor = 25,
+    VineCloseDoor = 26,
+    VineMossOpenDoor = 27,
+    VineMossCloseDoor = 28
 }
 
 public enum TileDirect
@@ -37,10 +45,10 @@ public enum TileDirect
 
 public enum RoomDirect
 {
-    Top,
-    Right,
-    Down,
-    Left
+    Top = 0,
+    Right = 1,
+    Down = 2,
+    Left = 3
 }
 
 public class RoomGenerator : MonoBehaviour
@@ -52,6 +60,10 @@ public class RoomGenerator : MonoBehaviour
     [Header ("Room")]
     [SerializeField]
     private GameObject roomParent;
+
+    [Header ("Door Tiles")]
+    [SerializeField]
+    private List<Tile> allDoors;   // Default, Moss, Vine, VineMoss
 
     [Header ("Tiles")]
     [SerializeField]
@@ -105,6 +117,7 @@ public class RoomGenerator : MonoBehaviour
         // 빈 방 생성
         CreateEmptyRoom(maxCount);
 
+        // Temp
         List<TileType> types = new List<TileType>() { 
             TileType.DefaultGround,
             TileType.MossGround,
@@ -118,7 +131,11 @@ public class RoomGenerator : MonoBehaviour
         {
             // DrawRoom(room, TileType.DefaultGround, Random.Range(3, 20), Random.Range(3, 20));
             DrawRoom(room, types[Random.Range(0, types.Count)], Random.Range(3, 20), Random.Range(3, 20));
+            // DrawRoom(room, types[Random.Range(0, types.Count)], 20, 20);
         }
+
+        // 문 생성
+        DrawDoors(rooms);
     }
 
     private void CreateEmptyRoom(int maxCount = 10)
@@ -227,102 +244,8 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
-    // 벽 생성
-    // public void GenerateWalls()
-    // {
-    //     float roomRadius = roomWidth / 2f;
-    //     foreach(Room room in rooms)
-    //     {
-    //         foreach(RoomDirect direct in room.EmptyDirects)
-    //         {
-    //             // 인접한 방이 없는 곳에 벽 생성
-    //             GameObject wall = Instantiate(wallPref);
-    //             wall.transform.parent = roomParent.transform;
-    //             Vector3 offset = Vector3.zero;
-
-    //             switch (direct)
-    //             {
-    //                 case RoomDirect.Top:
-    //                     offset += new Vector3(0f, 0f, roomRadius);
-    //                     break;
-    //                 case RoomDirect.Right:
-    //                     offset += new Vector3(roomRadius, 0f, 0f);
-    //                     wall.transform.rotation = Quaternion.Euler(new Vector3(0f, 180f, 0f));
-    //                     break;
-    //                 case RoomDirect.Down:
-    //                     offset += new Vector3(0f, 0f, -1 * roomRadius);
-    //                     wall.transform.rotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
-    //                     break;
-    //                 case RoomDirect.Left:
-    //                     offset += new Vector3(-1 * roomRadius, 0f, 0f);
-    //                     wall.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
-    //                     break;
-    //             }
-
-    //             wall.transform.position = new Vector3(
-    //                 room.X * roomWidth,
-    //                 wall.transform.position.y,
-    //                 room.Y * roomWidth
-    //             ) + offset;
-
-    //             walls.Add(wall);
-    //         }
-
-    //         // foreach(RoomDirect direct in room.ExistDirects)
-    //         // {
-    //         //     // 인접한 방이 있는 곳에 문 생성
-    //         //     GameObject door = Instantiate(doorPref);
-    //         //     Vector3 offset = Vector3.zero;
-
-    //         //     switch (direct)
-    //         //     {
-    //         //         case RoomDirect.Top:
-    //         //             offset += new Vector3(0f, 0f, roomRadius);
-    //         //             room.Top.ExistDirects.Remove(RoomDirect.Down);
-    //         //             break;
-    //         //         case RoomDirect.Right:
-    //         //             offset += new Vector3(roomRadius, 0f, 0f);
-    //         //             // door.transform.rotation = Quaternion.Euler(new Vector3(0f, 90f, 0f));
-    //         //             room.Right.ExistDirects.Remove(RoomDirect.Left);
-    //         //             break;
-    //         //         case RoomDirect.Down:
-    //         //             offset += new Vector3(0f, 0f, -1 * roomRadius);
-    //         //             room.Down.ExistDirects.Remove(RoomDirect.Top);
-    //         //             break;
-    //         //         case RoomDirect.Left:
-    //         //             offset += new Vector3(-1 * roomRadius, 0f, 0f);
-    //         //             // door.transform.rotation = Quaternion.Euler(new Vector3(0f, 90f, 0f));
-    //         //             room.Left.ExistDirects.Remove(RoomDirect.Right);
-    //         //             break;
-    //         //     }
-
-    //         //     door.transform.position = new Vector3(
-    //         //         room.X * roomWidth,
-    //         //         door.transform.position.y,
-    //         //         room.Y * roomWidth
-    //         //     ) + offset;
-
-    //         //     doors.Add(door);
-    //         // }
-    //     }
-    // }
-
-    // 모든 벽 제거
-    public void ClearWalls()
-    {
-        for (int i = 0; i < walls.Count; i++)
-        {
-            Destroy(walls[i]);
-        }
-        walls.Clear();
-
-        for (int i = 0; i < doors.Count; i++)
-        {
-            Destroy(doors[i]);
-        }
-        doors.Clear();
-    }
-
+    
+    // 타일 그리기
     private void DrawRoom(DungeonRoom room, TileType type, int rows, int cols)
     {
         ushort indexTileType = (ushort)type;
@@ -361,9 +284,142 @@ public class RoomGenerator : MonoBehaviour
             for (int row = 1; row < rows - 1; row++)
             {
                 currentTile = new Vector3Int(row, col, 0);
-                DrawTile(room.WallLayer, (TileType)indexTileType, TileDirect.Default, currentTile);
+                DrawTile(room.GroundLayer, (TileType)indexTileType, TileDirect.Default, currentTile);
             }
         }
+
+        // 방 크기에 맞추어 정 가운데로 정렬
+        room.TileMapParent.transform.localPosition = new Vector3(roomWidth / 2.0f, roomWidth / 2.0f, 0);
+        Vector3 tileMapSize = new Vector3(room.WallLayer.size.x, room.WallLayer.size.y, 0f);
+        room.TileMapParent.transform.localPosition -= tileMapSize * room.WallLayer.cellSize.x * 0.5f;
+    }
+
+    private void DrawDoors(DungeonRoom[] dungeonRooms)
+    {
+        for (int roomIndex = 0; roomIndex < rooms.Count; roomIndex++)
+        {
+            foreach (RoomDirect direct in rooms[roomIndex].ExistDirects)
+            {
+                Vector3Int roomSize = dungeonRooms[roomIndex].WallLayer.size;
+                Vector3Int centerDoorPos ;
+                // 중앙 배치
+                switch ((ushort)direct)
+                {
+                    case 0:
+                        centerDoorPos = new Vector3Int((int)(roomSize.x / 2), roomSize.y - 1);
+                        DrawTile(dungeonRooms[roomIndex].ObjectLayer, TileType.DefaultOpenDoor, (TileDirect)(ushort)direct, centerDoorPos);
+                        break;
+                    case 2:
+                        centerDoorPos = new Vector3Int((int)(roomSize.x / 2), 0);
+                        DrawTile(dungeonRooms[roomIndex].ObjectLayer, TileType.DefaultOpenDoor, (TileDirect)(ushort)direct, centerDoorPos);
+                        break;
+                    case 1:
+                        centerDoorPos = new Vector3Int(roomSize.x - 1, (int)(roomSize.y / 2));
+                        DrawTile(dungeonRooms[roomIndex].ObjectLayer, TileType.DefaultOpenDoor, (TileDirect)(ushort)direct, centerDoorPos);
+                        break;
+                    case 3:
+                        centerDoorPos = new Vector3Int(0, (int)(roomSize.y / 2));
+                        DrawTile(dungeonRooms[roomIndex].ObjectLayer, TileType.DefaultOpenDoor, (TileDirect)(ushort)direct, centerDoorPos);
+                        break;
+                }
+            }
+        }
+    }
+
+    // 벽 생성
+    public void GenerateWalls()
+    {
+        float roomRadius = roomWidth / 2f;
+        // foreach(Room room in rooms)
+        // {
+        //     foreach(RoomDirect direct in room.EmptyDirects)
+        //     {
+        //         // 인접한 방이 없는 곳에 벽 생성
+        //         GameObject wall = Instantiate(wallPref);
+        //         wall.transform.parent = roomParent.transform;
+        //         Vector3 offset = Vector3.zero;
+
+        //         switch (direct)
+        //         {
+        //             case RoomDirect.Top:
+        //                 offset += new Vector3(0f, 0f, roomRadius);
+        //                 break;
+        //             case RoomDirect.Right:
+        //                 offset += new Vector3(roomRadius, 0f, 0f);
+        //                 wall.transform.rotation = Quaternion.Euler(new Vector3(0f, 180f, 0f));
+        //                 break;
+        //             case RoomDirect.Down:
+        //                 offset += new Vector3(0f, 0f, -1 * roomRadius);
+        //                 wall.transform.rotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+        //                 break;
+        //             case RoomDirect.Left:
+        //                 offset += new Vector3(-1 * roomRadius, 0f, 0f);
+        //                 wall.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
+        //                 break;
+        //         }
+
+        //         wall.transform.position = new Vector3(
+        //             room.X * roomWidth,
+        //             wall.transform.position.y,
+        //             room.Y * roomWidth
+        //         ) + offset;
+
+        //         walls.Add(wall);
+        //     }
+
+        //     // foreach(RoomDirect direct in room.ExistDirects)
+        //     // {
+        //     //     // 인접한 방이 있는 곳에 문 생성
+        //     //     GameObject door = Instantiate(doorPref);
+        //     //     Vector3 offset = Vector3.zero;
+
+        //     //     switch (direct)
+        //     //     {
+        //     //         case RoomDirect.Top:
+        //     //             offset += new Vector3(0f, 0f, roomRadius);
+        //     //             room.Top.ExistDirects.Remove(RoomDirect.Down);
+        //     //             break;
+        //     //         case RoomDirect.Right:
+        //     //             offset += new Vector3(roomRadius, 0f, 0f);
+        //     //             // door.transform.rotation = Quaternion.Euler(new Vector3(0f, 90f, 0f));
+        //     //             room.Right.ExistDirects.Remove(RoomDirect.Left);
+        //     //             break;
+        //     //         case RoomDirect.Down:
+        //     //             offset += new Vector3(0f, 0f, -1 * roomRadius);
+        //     //             room.Down.ExistDirects.Remove(RoomDirect.Top);
+        //     //             break;
+        //     //         case RoomDirect.Left:
+        //     //             offset += new Vector3(-1 * roomRadius, 0f, 0f);
+        //     //             // door.transform.rotation = Quaternion.Euler(new Vector3(0f, 90f, 0f));
+        //     //             room.Left.ExistDirects.Remove(RoomDirect.Right);
+        //     //             break;
+        //     //     }
+
+        //     //     door.transform.position = new Vector3(
+        //     //         room.X * roomWidth,
+        //     //         door.transform.position.y,
+        //     //         room.Y * roomWidth
+        //     //     ) + offset;
+
+        //     //     doors.Add(door);
+        //     // }
+        // }
+    }
+
+    // 모든 벽 제거
+    public void ClearWalls()
+    {
+        for (int i = 0; i < walls.Count; i++)
+        {
+            Destroy(walls[i]);
+        }
+        walls.Clear();
+
+        for (int i = 0; i < doors.Count; i++)
+        {
+            Destroy(doors[i]);
+        }
+        doors.Clear();
     }
 
     private void DrawTile(Tilemap tileMap, TileType type, TileDirect direct, Vector3Int pos)
@@ -419,6 +475,18 @@ public class RoomGenerator : MonoBehaviour
                 // MossWaterEdge,
                 // VineMossWaterWall,
                 // VineMossWaterEdge,
+            case 21:
+            case 22:
+            case 23:
+            case 24:
+            case 25:
+            case 26:
+            case 27:
+            case 28:
+                // All doors
+                tile = allDoors[(ushort)type % 21];
+                break;
+
             default:
                 tile = null;
                 break;
