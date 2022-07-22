@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WeaponCollider : MonoBehaviour
 {
-
+    public Player PlayerUnit;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,12 +17,12 @@ public class WeaponCollider : MonoBehaviour
         
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Monster")
+        if (collision.gameObject.tag == "Monster" && PlayerUnit.isAttacking)
         {
-            // 적이 검에 닿았으면 Enemy의 OnDamage 호출
-            SendMessage("OnDamage");
+            // 몬스터에게 데미지
+            collision.gameObject.SendMessage("OnDamage", PlayerUnit.damage);
         }
     }
 }
