@@ -45,6 +45,7 @@ public class Monster : Entity
         Setup();
     }
 
+    float t = 4f;
     private void Update()
     {
         // 추적 대상의 존재 여부에 따라 다른 애니메이션을 재생
@@ -52,13 +53,33 @@ public class Monster : Entity
 
         // 주기적으로 추적할 대상의 위치를 찾아 경로를 갱신
         UpdatePath();
+
+        // **테스트 코드
+        if(Time.time > t && !dead)
+        {
+            OnDamage(100f);
+        }
     }
 
     // 주기적으로 추적할 대상의 위치를 찾아 경로를 갱신
     protected void UpdatePath()
     {
+        if (dead)
+        {
+            return;
+        }
+
         if (hasTarget)
         {
+            if (targetEntity.transform.position.x - transform.position.x > 0)
+            {
+                transform.localScale = new Vector3(-1f, 1f, 1f);
+            }
+            else
+            {
+                transform.localScale = new Vector3(1f, 1f, 1f);
+            }
+
             transform.position = Vector2.MoveTowards(transform.position, targetEntity.transform.position, speed * Time.deltaTime);
         }
         else
@@ -71,33 +92,43 @@ public class Monster : Entity
     // 피격 처리
     public override void OnDamage(float damage)
     {
-        if (!dead)
+        if (dead)
         {
-            audioPlayer.PlayOneShot(hitSound);
+            return;
         }
-
+        
         base.OnDamage(damage);
+        //audioPlayer.PlayOneShot(hitSound);
     }
 
     // 사망 처리
     public override void Die()
     {
-        base.Die();
+        if (dead)
+        {
+            return;
+        }
 
+        base.Die();
+        animator.SetTrigger("Die");
+        //audioPlayer.PlayOneShot(deathSound);
+        
         Collider[] colliders = GetComponents<Collider>();
         for (int i = 0; i < colliders.Length; i++)
         {
             colliders[i].enabled = false;
         }
-
-        animator.SetTrigger("Die");
-        audioPlayer.PlayOneShot(deathSound);
     }
 
     private void OnTriggerStay(Collider other)
     {
+        if (dead)
+        {
+            return;
+        }
+
         // 트리거 충돌한 상대방 게임 오브젝트가 추적 대상이라면 공격 실행   
-        if (!dead && Time.time >= lastAttackTime + timeBetAttack)
+        if (Time.time >= lastAttackTime + timeBetAttack)
         {
             Entity attackTarget = other.GetComponent<Entity>();
 

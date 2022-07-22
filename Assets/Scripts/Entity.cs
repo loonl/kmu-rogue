@@ -4,8 +4,8 @@ using UnityEngine;
 public class Entity : MonoBehaviour 
 {
     protected float maxHealth; // 시작 체력
-    public float health { get; protected set; } // 현재 체력
-    public bool dead { get; protected set; } // 사망 상태
+    protected float health; // 현재 체력
+    public bool dead; // 사망 상태
     public event Action onDeath; // 사망 시 발동 이벤트
 
     // 생명체가 활성화될때 상태 초기화
@@ -20,7 +20,7 @@ public class Entity : MonoBehaviour
     {
         health -= damage;
 
-        if (health <= 0 && !dead)
+        if (health <= 0)
         {
             Die();
         }
