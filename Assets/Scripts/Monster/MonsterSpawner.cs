@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MonsterSpawner : MonoBehaviour
 {
-    public GameObject monsterPrefab; // 생성할 몬스터 Prefab
+    public Monster monsterPrefab; // 생성할 몬스터 Prefab
 
     public Transform[] spawnPoints; // 소환 위치
 
@@ -26,13 +26,11 @@ public class MonsterSpawner : MonoBehaviour
         for (int i = 0; i < spawnPoints.Length; i++)
         {
             Transform spawnPoint = spawnPoints[i];
-            Monster monster = Instantiate(monsterPrefab.GetComponentInChildren<Monster>(), spawnPoint.position, spawnPoint.rotation);
+            Monster monster = Instantiate(monsterPrefab, spawnPoint.position, spawnPoint.rotation);
 
             monsters.Add(monster);
-
             monster.onDeath += () => monsters.Remove(monster);
-            monster.onDeath += () => Debug.Log("dead");
-            monster.onDeath += () => Destroy(monster.gameObject, 5f);
+            monster.onDeath += () => Destroy(monster.gameObject, 2f);
         }
     }
 }
