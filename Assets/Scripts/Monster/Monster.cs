@@ -53,12 +53,6 @@ public class Monster : Entity
 
         // 주기적으로 추적할 대상의 위치를 찾아 경로를 갱신
         UpdatePath();
-
-        // **테스트 코드
-        if(Time.time > t && !dead)
-        {
-            OnDamage(100f);
-        }
     }
 
     // 주기적으로 추적할 대상의 위치를 찾아 경로를 갱신
