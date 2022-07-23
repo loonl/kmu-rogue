@@ -107,7 +107,8 @@ public class Monster : Entity
         Debug.Log("Zombie Dead");
     }
 
-    private void OnTriggerStay(Collider other)
+
+    private void OnCollisionStay2D(Collision2D other)
     {
         if (dead)
         {
@@ -117,7 +118,7 @@ public class Monster : Entity
         // 트리거 충돌한 상대방 게임 오브젝트가 추적 대상이라면 공격 실행   
         if (Time.time >= lastAttackTime + timeBetAttack)
         {
-            Entity attackTarget = other.GetComponent<Entity>();
+            Entity attackTarget = other.gameObject.GetComponent<Entity>();
 
             if (attackTarget != null && attackTarget == targetEntity)
             {
