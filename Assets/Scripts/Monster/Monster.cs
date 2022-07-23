@@ -35,7 +35,7 @@ public class Monster : Entity
     {
         // 컴포넌트 초기화
         rigidbody2d = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         audioPlayer = GetComponent<AudioSource>();
     }
 
@@ -45,7 +45,6 @@ public class Monster : Entity
         Setup();
     }
 
-    float t = 4f;
     private void Update()
     {
         // 추적 대상의 존재 여부에 따라 다른 애니메이션을 재생
@@ -53,12 +52,6 @@ public class Monster : Entity
 
         // 주기적으로 추적할 대상의 위치를 찾아 경로를 갱신
         UpdatePath();
-
-        // **테스트 코드
-        if(Time.time > t && !dead)
-        {
-            OnDamage(100f);
-        }
     }
 
     // 주기적으로 추적할 대상의 위치를 찾아 경로를 갱신
@@ -92,23 +85,15 @@ public class Monster : Entity
     // 피격 처리
     public override void OnDamage(float damage)
     {
-        if (dead)
-        {
-            return;
-        }
-        
         base.OnDamage(damage);
         //audioPlayer.PlayOneShot(hitSound);
+
+        Debug.Log("Zombie OnDamage: " + damage);
     }
 
     // 사망 처리
     public override void Die()
     {
-        if (dead)
-        {
-            return;
-        }
-
         base.Die();
         animator.SetTrigger("Die");
         //audioPlayer.PlayOneShot(deathSound);
@@ -118,6 +103,8 @@ public class Monster : Entity
         {
             colliders[i].enabled = false;
         }
+
+        Debug.Log("Zombie Dead");
     }
 
     private void OnTriggerStay(Collider other)

@@ -1235,7 +1235,7 @@ RectTransform:
   m_GameObject: {fileID: 3000641247448760336}
   m_LocalRotation: {x: -0, y: 0.008726557, z: -0, w: 0.9999619}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7010720501219873086}
@@ -1281,7 +1281,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e208b8266a4b29b47ba57376eee16dea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  dead: 0
   speed: 3
   damage: 0
   isAttacking: 0
@@ -3810,7 +3810,7 @@ Transform:
   m_GameObject: {fileID: 8345767563567106368}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3781789741724619173}
@@ -3839,7 +3839,7 @@ Animator:
   m_GameObject: {fileID: 8345767563567106368}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: ab937231d0600440fb0d8757568d78d7, type: 2}
+  m_Controller: {fileID: 9100000, guid: 6d2c42a011ad2a1429b88f245b4c8a78, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
