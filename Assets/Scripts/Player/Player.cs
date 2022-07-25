@@ -3,34 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : Entity {
-    // �̵� �ӵ� �����ϴ� ����
+    // public variables
     public float speed;
     public float damage;
+    public float attackRange; // 0 ~ 25
     public bool isAttacking;
 
     Animator anim;
+    WeaponCollider wpnColl;
 
     void Start()
     {
         anim = transform.GetChild(0).gameObject.GetComponent<Animator>();
+        wpnColl = transform.GetChild(0).gameObject.GetComponent<WeaponCollider>();
 
-        // �ִϸ������� �ִϸ��̼��� ������ ȣ���� �Լ��� ���� - Die
+        // used in animator end event - death
         anim.GetComponent<PlayerAnimreciver>().onDieComplete = () =>
         {
-            // Die �ִϸ��̼� ����� ������ ��Ȱ��ȭ
+            // hide character
             gameObject.SetActive(false);
         };
 
-        // �ִϸ������� �ִϸ��̼��� ������ ȣ���� �Լ� ���� - Attack
+        // used in animator end event - attack
         anim.GetComponent<PlayerAnimreciver>().onAttackComplete = () =>
         {
-            // Attack �ִϸ��̼� ����� ������ ����� �����ϰ� ��ȯ
+            // enable re-attack
             isAttacking = false;
+
+            // clear attack collider monster list
+            if (wpnColl.monsters.Count > 0) 
+            {
+                wpnColl.monsters.Clear();
+            }
         };
 
 
-        // �ʱ� ���� ����
+        // variables init
         maxHealth = 100.0f;
+        attackRange = 5.0f;
         health = maxHealth;
         damage = 25.0f;
         speed = 3.0f;
@@ -38,15 +48,15 @@ public class Player : Entity {
 
     void Update()
     {
-        // �׾����� input �� �ް�
+        // should not work in dead condition
         if (dead)
             return;
 
-        // �����¿� ������ input ��������
-        // �밢�� ���̵� 1�� �����ֱ� ���ؼ� normalize
+        // get input
+        // normalize for making speed 1
         Vector3 moveInput = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0).normalized;
 
-        // �¿� �̵��� ���� ĳ���� �������ֱ�
+        // flip character depending on heading direction
         if (moveInput.x >
             0 && transform.localScale.x > 0)
         {
@@ -57,15 +67,15 @@ public class Player : Entity {
             transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
         }
 
-        // �����¿� ������ ����
+        // change character's position
         transform.position += moveInput * Time.deltaTime * speed;
 
-        // �ִϸ��̼� ����
+        // change animation depending on speed
         anim.SetFloat("Speed", moveInput.magnitude);
 
         if (Input.GetButtonDown("Fire1") && !isAttacking)
         {
-            // �ִϸ��̼� Attack���� ����
+            // change animation to attack
             anim.SetTrigger("Attack");
             isAttacking = true;
         }
@@ -79,28 +89,26 @@ public class Player : Entity {
 
     }
 
-    // �ǰ� ó��
     public override void OnDamage(float damage)
     {
         base.OnDamage(damage);
 
-        // ü���� ������ 0���� ����
+        // adjust health to 0 if minus
         if (health < 0f)
             health = 0f;
 
-        // �ִϸ��̼� Stunned�� ����
+        // change animation to stunned
         anim.SetTrigger("Hit");
 
         // debug
-        print(health);
+        print("Player's health : " + health);
     }
 
-    // ��� ó��
     public override void Die()
     {
         base.Die();
 
-        // �ִϸ��̼� Death�� ����
+        // change animation to death
         anim.SetTrigger("Die");
     }
 }

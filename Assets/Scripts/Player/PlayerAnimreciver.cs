@@ -4,11 +4,10 @@ using UnityEngine;
 
 public class PlayerAnimreciver : MonoBehaviour
 {
-    // 호출할 델리게이트
     public System.Action onDieComplete;
     public System.Action onAttackComplete;
 
-    // Death 애니메이션 끝에 달아줄 메소드
+    // executed at the end of animation death
     public void OnDieComplete()
     {
         if (onDieComplete != null)
@@ -17,7 +16,7 @@ public class PlayerAnimreciver : MonoBehaviour
         }
     }
 
-    // Attack 애니메이션 끝에 달아줄 메소드
+    // executed at the end of animation attack
     public void OnAttackComplete()
     {
         if (onAttackComplete != null)
