@@ -7,9 +7,12 @@ using UnityEngine.Audio;
 
 public class GameManager : MonoBehaviour
 {
+    public GameObject FadeIMG;
+    float fadeTime = 3f;
     // Start is called before the first frame update
     private void Awake()
     {
+        StartCoroutine("FadeIn");
     }
 
     // Update is called once per frame
@@ -20,7 +23,8 @@ public class GameManager : MonoBehaviour
 
     public void LoadNextScene()
     {
-        SceneManager.LoadScene("StageScene");
+        FadeIMG.SetActive(true);
+        StartCoroutine("FadeOut");
     }
 
     public void ExitGame()
@@ -36,5 +40,34 @@ public class GameManager : MonoBehaviour
     {
         audioMixer.SetFloat(parameterName,
         (volumeSlider.value <= volumeSlider.minValue) ? -80f : volumeSlider.value);
+    }
+
+    public IEnumerator FadeIn()
+    {
+        Image image = FadeIMG.GetComponent<Image>();
+        Color color = image.color;
+        while (color.a > 0f)
+        {
+            color.a -= Time.deltaTime / fadeTime;
+            image.color = color;
+            yield return null;
+        }
+        FadeIMG.SetActive(false);
+
+    }
+
+    public IEnumerator FadeOut()
+    {
+        Image image = FadeIMG.GetComponent<Image>();
+        Color color = image.color;
+        while (color.a < 1f)
+        {
+            color.a += Time.deltaTime / fadeTime;
+            image.color = color;
+            yield return null;
+        }
+        Debug.Log(1);
+
+        SceneManager.LoadScene("StageScene");
     }
 }
