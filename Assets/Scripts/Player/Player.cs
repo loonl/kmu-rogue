@@ -2,6 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum WeaponType
+{
+    Melee = 0,
+    Bow = 1,
+    Staff = 2
+}
+
+public struct WeaponInfo
+{
+    public string info;
+    public WeaponType weapontype;
+    public WeaponInfo(string _info, WeaponType _weapontype)
+    {
+        info = _info;
+        weapontype = _weapontype;
+    }
+}
+
 public class Player : Entity {
     // public variables
     public float speed;
@@ -9,13 +27,21 @@ public class Player : Entity {
     public float attackRange; // 0 ~ 25
     public bool isAttacking;
 
+    // equipments
+    public List<string> helmetsList = new List<string>();
+    public List<string> armorsList = new List<string>();
+    public List<string> pantsList = new List<string>();
+    public List<WeaponInfo> weaponsList = new List<WeaponInfo>();
+
     Animator anim;
     WeaponCollider wpnColl;
+    SPUM_SpriteList spumMgr;
 
     void Start()
     {
         anim = transform.GetChild(0).gameObject.GetComponent<Animator>();
         wpnColl = transform.GetChild(0).gameObject.GetComponent<WeaponCollider>();
+        spumMgr = transform.GetChild(0).GetChild(0).GetComponent<SPUM_SpriteList>();
 
         // used in animator end event - death
         anim.GetComponent<PlayerAnimreciver>().onDieComplete = () =>
@@ -43,7 +69,7 @@ public class Player : Entity {
         attackRange = 5.0f;
         health = maxHealth;
         damage = 25.0f;
-        speed = 3.0f;
+        speed = 3.0f;        
     }
 
     void Update()
@@ -73,6 +99,34 @@ public class Player : Entity {
         // change animation depending on speed
         anim.SetFloat("Speed", moveInput.magnitude);
 
+
+        /**
+        * Input Handling
+        */
+
+        // test PlayerChange
+        // 0 = Helmet, 1 = Armor, 2 = Pants, 3 = Weapons
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            PlayerPartsChange(0, Random.Range(0, helmetsList.Count));
+        } 
+
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            PlayerPartsChange(1, Random.Range(0, armorsList.Count));
+        }
+
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            PlayerPartsChange(2, Random.Range(0, pantsList.Count));
+        }
+
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            PlayerPartsChange(3, Random.Range(0, weaponsList.Count));
+        }
+
+        // Attack Input
         if (Input.GetButtonDown("Fire1") && !isAttacking)
         {
             // change animation to attack
@@ -86,7 +140,55 @@ public class Player : Entity {
             print("onDamageTest");
             OnDamage(damage);
         }
+    }
 
+    // change player's equipment parts
+    private void PlayerPartsChange(int ver, int index)
+    {
+        switch (ver)
+        {
+            case 0: // helmet
+                var temp = helmetsList[index].Split(",");
+
+                // insert new equipment's data into spumSpriteList
+                for (int i = 0; i < temp.Length; i++) 
+                    spumMgr._hairListString[i] = temp[i];
+
+                // re-sync data
+                spumMgr.SyncPath(spumMgr._hairList, spumMgr._hairListString);
+                break;
+
+            case 1: // armors
+                var temp2 = armorsList[index].Split(",");
+
+                // insert new equipment's data into spumSpriteList
+                for (int i = 0; i < temp2.Length; i++)
+                    spumMgr._armorListString[i] = temp2[i];
+
+                // re-sync data
+                spumMgr.SyncPath(spumMgr._armorList, spumMgr._armorListString);
+                break;
+            case 2: // pants
+                var temp3 = pantsList[index].Split(",");
+
+                // insert new equipment's data into spumSpriteList
+                for (int i = 0; i < temp3.Length; i++)
+                    spumMgr._pantListString[i] = temp3[i];
+
+                // re-sync data
+                spumMgr.SyncPath(spumMgr._pantList, spumMgr._pantListString);
+                break;
+            case 3: // weapon
+                var temp4 = weaponsList[index].info.Split(",");
+
+                // insert new equipment's data into spumSpriteList
+                for (int i = 0; i < temp4.Length; i++)
+                    spumMgr._weaponListString[i] = temp4[i];
+
+                // re-sync data
+                spumMgr.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
+                break;
+        }
     }
 
     public override void OnDamage(float damage)
