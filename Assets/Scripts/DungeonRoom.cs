@@ -17,4 +17,6 @@ public class DungeonRoom : MonoBehaviour
     public Tilemap GroundLayer { get { return _groundLayer; } }
     public Tilemap WallLayer { get { return _wallLayer; } }
     public Tilemap ObjectLayer { get { return _objectLayer; } }
+
+    public Portal[] Portals = new Portal[] { null, null, null, null };
 }

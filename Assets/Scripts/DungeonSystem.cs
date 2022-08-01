@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class DungeonSystem : MonoBehaviour
 {
+    private static DungeonSystem instance = null;
+    public static DungeonSystem Instance { get { return instance; } }
+
     private int floor;
 
     [SerializeField]
@@ -30,22 +33,17 @@ public class DungeonSystem : MonoBehaviour
 
     public int Floor { get { return floor; } }
 
-    private void Start()
+    private void Awake()
     {
-        // floor = gameManager.Floor;
-        // Load();
-
-        // // Player reset
-        // gameManager.Player.IdleMode();
-        // gameManager.Player.Agent.enabled = false;
-        // gameManager.Player.transform.position = Vector3.zero;
-        // gameManager.Player.Agent.enabled = true;
-
-        // gameManager.UIController.ActivateFloorText(floor);
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
     }
-    // -------------------------------------------------------------
-    // Level design
-    // -------------------------------------------------------------
 
     public void Load()
     {
@@ -85,33 +83,34 @@ public class DungeonSystem : MonoBehaviour
     }
 
     // -------------------------------------------------------------
-    // 포탈 생성
+    // 포탈
     // -------------------------------------------------------------
-    // private void CreatePortal(int roomNumber, bool isNextFloorPortal = true)
-    // {
-    //     if (isNextFloorPortal)
-    //     {
-    //         PortalSystem.Instance.CreatePortal(
-    //             new Vector3(
-    //                 generator.Rooms[roomNumber].X * roomWidth,
-    //                 2f,
-    //                 generator.Rooms[roomNumber].Y * roomWidth
-    //             ),
-    //             PortalType.NextFloor
-    //         );
-    //     }
-    //     else
-    //     {
-    //         PortalSystem.Instance.CreatePortal(
-    //             new Vector3(
-    //                 generator.Rooms[roomNumber].X * roomWidth,
-    //                 2f,
-    //                 generator.Rooms[roomNumber].Y * roomWidth
-    //             ),
-    //             PortalType.GoViliage
-    //         );
-    //     }
-    // }
+    public Vector3 GetTargetPortalPos(int dungeonRoomIndex, ushort direct)
+    {
+        // 연결된 방의 반대 방향 direct 문 위치로 이동
+        Vector3 offset;
+
+        if (direct == 0)
+        {
+            offset = new Vector3(0, 1f, 0);
+        }
+        else if (direct == 1)
+        {
+            offset = new Vector3(1f, 0, 0);
+        }
+        else if (direct == 2)
+        {
+            offset = new Vector3(0, -1f, 0);
+        }
+        else
+        {
+            offset = new Vector3(-1f, 0, 0);
+        }
+
+        generator.Rooms[dungeonRoomIndex].Portals[(direct + 2) % 4].DeActivate();   // !!! temp
+        return generator.Rooms[dungeonRoomIndex].Portals[(direct + 2) % 4].transform.position + offset * 0.5f;
+    }
+
     // -------------------------------------------------------------
     // 스포너 생성
     // -------------------------------------------------------------

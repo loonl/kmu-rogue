@@ -89,12 +89,14 @@ public class RoomGenerator : MonoBehaviour
 
     [SerializeField]
     private GameObject emptyRoomPref;
+    [SerializeField]
+    private GameObject portalPref;
     
     private List<Room> rooms;            // 모든 방 리스트
     private Stack<Room> visitedRooms;
     private List<DungeonRoom> dungeonRooms;
 
-    public List<Room> Rooms { get { return rooms; } }
+    public List<DungeonRoom> Rooms { get { return dungeonRooms; } }
     
     private void Awake()
     {
@@ -132,7 +134,7 @@ public class RoomGenerator : MonoBehaviour
         }
 
         // 문 생성
-        DrawDoors(rooms);
+        GenerateDoors(rooms);
     }
 
     public void Clear()
@@ -176,7 +178,7 @@ public class RoomGenerator : MonoBehaviour
             else
             {
                 // before room index로 새 room 생성
-                Room newRoom = new Room(selectRoom.X, selectRoom.Y);
+                Room newRoom = new Room(selectRoom.X, selectRoom.Y, roomCount);
                 // selectRoom에 인접한 빈 room 중 랜덤하게 선택하여 selectRoom과 상호 연결
                 RoomDirect selected = selectRoom.EmptyDirects[Random.Range(0, selectRoom.EmptyDirects.Count)];
                 selectRoom.InterconnectRoom(newRoom, selected);
@@ -293,34 +295,49 @@ public class RoomGenerator : MonoBehaviour
         room.TileMapParent.transform.localPosition -= tileMapSize * room.WallLayer.cellSize.x * 0.5f;
     }
 
-    private void DrawDoors(DungeonRoom[] dungeonRooms)
+    private void GenerateDoors(DungeonRoom[] dungeonRooms)
     {
         for (int roomIndex = 0; roomIndex < rooms.Count; roomIndex++)
         {
             foreach (RoomDirect direct in rooms[roomIndex].ExistDirects)
             {
+                // 벽이 인접한 방향
                 Vector3Int roomSize = dungeonRooms[roomIndex].WallLayer.size;
-                Vector3Int centerDoorPos ;
-                // 중앙 배치
+                Vector3Int centerDoorPos;
+
                 switch ((ushort)direct)
                 {
                     case 0:
                         centerDoorPos = new Vector3Int((int)(roomSize.x / 2), roomSize.y - 1);
-                        DrawTile(dungeonRooms[roomIndex].ObjectLayer, TileType.DefaultOpenDoor, (TileDirect)(ushort)direct, centerDoorPos);
                         break;
                     case 2:
                         centerDoorPos = new Vector3Int((int)(roomSize.x / 2), 0);
-                        DrawTile(dungeonRooms[roomIndex].ObjectLayer, TileType.DefaultOpenDoor, (TileDirect)(ushort)direct, centerDoorPos);
                         break;
                     case 1:
                         centerDoorPos = new Vector3Int(roomSize.x - 1, (int)(roomSize.y / 2));
-                        DrawTile(dungeonRooms[roomIndex].ObjectLayer, TileType.DefaultOpenDoor, (TileDirect)(ushort)direct, centerDoorPos);
                         break;
                     case 3:
                         centerDoorPos = new Vector3Int(0, (int)(roomSize.y / 2));
-                        DrawTile(dungeonRooms[roomIndex].ObjectLayer, TileType.DefaultOpenDoor, (TileDirect)(ushort)direct, centerDoorPos);
+                        break;
+                    default:
+                        centerDoorPos = Vector3Int.zero;
                         break;
                 }
+
+                // 포탈 생성 및 연결
+                DrawTile(dungeonRooms[roomIndex].ObjectLayer, TileType.DefaultCloseDoor, (TileDirect)(ushort)direct, centerDoorPos);
+                
+                GameObject portalObject = Instantiate(portalPref);
+                portalObject.transform.parent = dungeonRooms[roomIndex].transform;
+                // DrawTile로 그려진 위치로 portalPref 위치 조정 (room start pos + door pos + offset)
+                portalObject.transform.localPosition = new Vector3(
+                    roomSize.x * -0.5f + centerDoorPos.x + 0.5f,
+                    roomSize.y * -0.5f + centerDoorPos.y + 0.5f, 
+                    0f
+                );
+                Portal portal = portalObject.GetComponent<Portal>();
+                portal.Connect(rooms[roomIndex].GetConnectedRoomId((ushort)direct), (ushort)direct);
+                dungeonRooms[roomIndex].Portals[(ushort)direct] = portal;
             }
         }
     }
