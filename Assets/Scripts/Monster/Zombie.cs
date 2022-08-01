@@ -1,11 +1,15 @@
+ï»¿using UnityEngine;
+
 public class Zombie : Monster
 {
-    // ¸ó½ºÅÍÀÇ ½ºÅİ ÃÊ±âÈ­
-    public override void Setup()
+    // ëª¬ìŠ¤í„°ì˜ ìŠ¤í…Ÿ ì´ˆê¸°í™”
+    protected override void Setup()
     {
         maxHealth = 100f;
-        health = 100f;
+        corpseHealth = 75f;
         damage = 20f;
         speed = 1f;
+
+        base.Setup();
     }
 }
