@@ -36,12 +36,15 @@ public class Player : Entity {
     Animator anim;
     WeaponCollider wpnColl;
     SPUM_SpriteList spumMgr;
+    Rigidbody2D rig;
+    int curWpnIndex;
 
     void Start()
     {
         anim = transform.GetChild(0).gameObject.GetComponent<Animator>();
         wpnColl = transform.GetChild(0).gameObject.GetComponent<WeaponCollider>();
         spumMgr = transform.GetChild(0).GetChild(0).GetComponent<SPUM_SpriteList>();
+        rig = GetComponent<Rigidbody2D>();
 
         // used in animator end event - death
         anim.GetComponent<PlayerAnimreciver>().onDieComplete = () =>
@@ -63,13 +66,27 @@ public class Player : Entity {
             }
         };
 
+        // used in animator end event - skill
+        anim.GetComponent<PlayerAnimreciver>().onSkillComplete = () =>
+        {
+            // enable re-attack
+            isAttacking = false;
+
+            // clear attack collider monster list
+            if (wpnColl.monsters.Count > 0)
+            {
+                wpnColl.monsters.Clear();
+            }
+        };
+
 
         // variables init
         maxHealth = 100.0f;
         attackRange = 5.0f;
         health = maxHealth;
         damage = 25.0f;
-        speed = 3.0f;        
+        speed = 2.5f;
+        curWpnIndex = 0;
     }
 
     void Update()
@@ -94,10 +111,10 @@ public class Player : Entity {
         }
 
         // change character's position
-        transform.position += moveInput * Time.deltaTime * speed;
+        rig.velocity = moveInput * speed;
 
         // change animation depending on speed
-        anim.SetFloat("Speed", moveInput.magnitude);
+        anim.SetFloat("Speed", moveInput.magnitude * speed);
 
 
         /**
@@ -126,9 +143,22 @@ public class Player : Entity {
             PlayerPartsChange(3, Random.Range(0, weaponsList.Count));
         }
 
+        if (Input.GetKeyDown(KeyCode.Semicolon))
+        {
+            PlayerPartsChange(3, 163);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Quote))
+        {
+            PlayerPartsChange(3, 167);
+        }
+
         // Attack Input
         if (Input.GetButtonDown("Fire1") && !isAttacking)
         {
+            // update weapon state
+            anim.SetInteger("WpnState", (int)weaponsList[curWpnIndex].weapontype);
+
             // change animation to attack
             anim.SetTrigger("Attack");
             isAttacking = true;
@@ -139,6 +169,17 @@ public class Player : Entity {
         {
             print("onDamageTest");
             OnDamage(damage);
+        }
+
+        // test skill input
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            // update weapon state
+            anim.SetInteger("WpnState", (int)weaponsList[curWpnIndex].weapontype);
+
+            // change animation to skill
+            anim.SetTrigger("Skill");
+            isAttacking = true;
         }
     }
 
@@ -179,6 +220,7 @@ public class Player : Entity {
                 spumMgr.SyncPath(spumMgr._pantList, spumMgr._pantListString);
                 break;
             case 3: // weapon
+                curWpnIndex = index;
                 var temp4 = weaponsList[index].info.Split(",");
 
                 // insert new equipment's data into spumSpriteList

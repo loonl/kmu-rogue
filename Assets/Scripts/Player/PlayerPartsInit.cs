@@ -155,7 +155,5 @@ public class PlayerPartsInit : MonoBehaviour
             string wpnName = rootPath + weaponPath3 + staff3[i];
             pl.weaponsList.Add(new WeaponInfo(",," + wpnName + ",", WeaponType.Staff));
         }
-
-        print(pl.weaponsList.Count);
     }
 }
