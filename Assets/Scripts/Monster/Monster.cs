@@ -20,12 +20,11 @@ public class Monster : Entity
     protected float lastAttackTime; // 마지막 공격 시점
 
     protected Entity targetEntity; // 추적 대상
+    protected Vector2 direction; // 경로 방향
     protected string action = "moving"; // 현재 행동
 
     public event Action onRevive; // 부활 시 발동 이벤트
     public event Action onEliminate; // 시체제거 시 발동 이벤트
-
-    protected Vector2 direction;
 
     // 추적 대상의 존재 여부
     protected bool hasTarget
@@ -59,7 +58,6 @@ public class Monster : Entity
 
     protected void Start()
     {
-
         Setup();
     }
 
@@ -105,7 +103,7 @@ public class Monster : Entity
         }
     }
 
-    // 이동 행동
+    // 이동 수행
     protected virtual void Moving()
     {
         rigidbody2d.velocity = direction * speed;
@@ -130,7 +128,7 @@ public class Monster : Entity
 
         //audioPlayer.PlayOneShot(hitSound);
 
-        Debug.Log("Zombie OnDamage: " + health);
+        Debug.Log("Zombie Health: " + health);
     }
 
     // 사망 처리
@@ -141,8 +139,6 @@ public class Monster : Entity
 
         animator.SetTrigger("Die");
         //audioPlayer.PlayOneShot(deathSound);
-
-        Debug.Log("Zombie Dead");
     }
 
     // 시체제거 처리
@@ -152,8 +148,6 @@ public class Monster : Entity
         {
             onEliminate();
         }
-
-        Debug.Log("Zombie Eliminate");
     }
 
     // 부활 처리
@@ -167,8 +161,6 @@ public class Monster : Entity
         Setup();
 
         animator.SetTrigger("Revive");
-
-        Debug.Log("Zombie Revive");
     }
 
     protected void OnCollisionStay2D(Collision2D other)
@@ -178,7 +170,7 @@ public class Monster : Entity
             return;
         }
 
-        // 충돌한 상대방 게임 오브젝트가 추적 대상이라면 공격 실행
+        // 충돌한 게임 오브젝트가 추적 대상이라면 공격
         if (Time.time >= lastAttackTime + attackCoolTime)
         {
             Entity attackTarget = other.gameObject.GetComponent<Entity>();
@@ -192,7 +184,7 @@ public class Monster : Entity
         }
     }
 
-    // 몬스터의 스텟 초기화
+    // 몬스터 초기화
     protected virtual void Setup() {
         health = maxHealth;
         dead = false;

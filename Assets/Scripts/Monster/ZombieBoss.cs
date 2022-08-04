@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class RushZombie : Monster
+public class ZombieBoss : Monster
 {
     bool rushing = false; // 돌진 중 여부
-    protected float rushCoolTime = 5.5f; // 돌진 쿨타임
-    protected float lastRushTime = -4.5f; // 마지막 돌진 시점
+    int rushStep = 0; // 돌진 횟수
+    protected float rushCoolTime = 0.6f; // 돌진 쿨타임
+    protected float lastRushTime = 1f; // 마지막 돌진 시점
 
     bool rushReady = false; // 돌진 준비중 여부
     protected float timeForRushReady = 1f; // 돌진 준비시간
@@ -13,7 +14,7 @@ public class RushZombie : Monster
     // 몬스터 초기화
     protected override void Setup()
     {
-        maxHealth = 125f;
+        maxHealth = 400f;
         corpseHealth = 75f;
         damage = 20f;
         speed = 1f;
@@ -50,15 +51,27 @@ public class RushZombie : Monster
         }
         else if (rushReady == true)
         {
+            rushReady = false;
             rigidbody2d.AddForce(direction * 300f);
             damage = 40f;
-            rushReady = false;
         }
         else if (Time.time >= lastRushTime + timeForRushReady + 0.5f)
         {
             action = "moving";
             damage = 20f;
             rushing = false;
+            if (rushStep <= 2)
+            {
+                rushStep++;
+                rushCoolTime = 0.6f;
+                timeForRushReady = 0.1f;
+            }
+            else
+            {
+                rushStep = 0;
+                rushCoolTime = 5.5f;
+                timeForRushReady = 1f;
+            }
         }
     }
 
@@ -71,7 +84,7 @@ public class RushZombie : Monster
 
         // 목표가 가까워지면 돌진
         if (Time.time >= lastRushTime + rushCoolTime && rushing == false)
-        {   
+        {
             Entity entity = other.gameObject.GetComponent<Entity>();
             if (targetEntity == entity)
             {
@@ -83,3 +96,8 @@ public class RushZombie : Monster
         }
     }
 }
+
+// 0 대기 돌진
+// 1 돌진
+// 2 돌진 쿨타임
+// 

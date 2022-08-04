@@ -25,7 +25,6 @@ public class RevivalZombie : Monster
         }
         else if (action == "reviving")
         {
-            rigidbody2d.velocity = Vector2.zero;
             Reviving();
         }
 
@@ -33,9 +32,10 @@ public class RevivalZombie : Monster
         animator.SetBool("HasTarget", hasTarget);
     }
 
-    // 부활 행동
+    // 부활 수행
     protected void Reviving()
     {
+        rigidbody2d.velocity = Vector2.zero;
         if (Time.time >= startReviveTime + timeBetRevive)
         {
             Revive();
