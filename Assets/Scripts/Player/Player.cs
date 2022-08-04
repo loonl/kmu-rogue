@@ -79,10 +79,10 @@ public class Player : Entity {
 
         // first equipment init
         curWeapon = parts.weaponsList[1];
-        curShield = parts.shieldsList[0];
-        curHelmet = parts.helmetsList[0];
-        curArmor = parts.armorsList[0];
-        curPants = parts.pantsList[0];
+        curShield = parts.shieldsList[1];
+        curHelmet = parts.helmetsList[1];
+        curArmor = parts.armorsList[1];
+        curPants = parts.pantsList[1];
 
         // player stat variables init
         maxHealth = 100.0f + curShield.extrahp + curHelmet.extrahp + curArmor.extrahp + curPants.extrahp;

@@ -87,6 +87,13 @@ public class PlayerParts : MonoBehaviour
     // called before start
     private void Awake()
     {
+        // first elements init
+        helmetsList.Add(new ArmourInfo("", 0.0f));
+        armorsList.Add(new ArmourInfo("", 0.0f));
+        pantsList.Add(new ArmourInfo("", 0.0f));
+        shieldsList.Add(new ArmourInfo("", 0.0f));
+        weaponsList.Add(new WeaponInfo("", WeaponType.Melee, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
+
         // helmet list init
         for (int i = 0; i < helmet1.Length; i++)
             helmetsList.Add(new ArmourInfo(rootPath + helmetPath1 + helmet1[i], 1.0f));
@@ -115,8 +122,6 @@ public class PlayerParts : MonoBehaviour
             pantsList.Add(new ArmourInfo(rootPath + pantsPath2 + pants2[i], 1.0f));
 
         // weapon list init
-        weaponsList.Add(new WeaponInfo("", WeaponType.Melee, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
-
         for (int i = 0; i < melee1.Length; i++)
             weaponsList.Add(new WeaponInfo(rootPath + weaponPath1 + melee1[i], WeaponType.Melee, 15.0f, 25.0f, 1.0f, 2.0f, 5.0f));
 
@@ -138,9 +143,8 @@ public class PlayerParts : MonoBehaviour
         for (int i = 0; i < staff3.Length; i++)
             weaponsList.Add(new WeaponInfo(rootPath + weaponPath3 + staff3[i], WeaponType.Staff, 15.0f, 25.0f, 1.0f, 2.0f, 5.0f));
 
-        // shield list init
-        shieldsList.Add(new ArmourInfo("", 0.0f));
 
+        // shield list init       
         for (int i = 0; i < shield2.Length; i++)
             shieldsList.Add(new ArmourInfo(rootPath + weaponPath2 + shield2[i], 1.0f));
 
