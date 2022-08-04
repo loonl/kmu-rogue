@@ -2,21 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponCollider : MonoBehaviour
+public class PlayerSkillCollider : MonoBehaviour
 {
     Player playerUnit;
-    ArcCollider2D arc;
-    public PolygonCollider2D poly;
+    public CircleCollider2D circle;
     public List<GameObject> monsters;
 
     // Start is called before the first frame update
     void Start()
     {
-        playerUnit = transform.GetComponentInParent<Player>();
-        arc = GetComponent<ArcCollider2D>();
-        poly = GetComponent<PolygonCollider2D>();
-
-        poly.enabled = false;
+        playerUnit = GameObject.Find("Player").GetComponent<Player>();
+        circle = GetComponent<CircleCollider2D>();
+        circle.enabled = false;
     }
 
     // Update is called once per frame
@@ -26,16 +23,16 @@ public class WeaponCollider : MonoBehaviour
 
     public void SetAttackRange(float value)
     {
-        arc.radius = value;
-    } 
+        circle.radius = value;
+    }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Monster" && playerUnit.isAttacking && !monsters.Contains(collision.gameObject))
+        if (collision.gameObject.tag == "Monster" && playerUnit.remainCool <= 0.0f && !monsters.Contains(collision.gameObject))
         {
             monsters.Add(collision.gameObject);
             // execute ondamage function when monster is in range
-            collision.gameObject.SendMessage("OnDamage", playerUnit.attackDamage);
+            collision.gameObject.SendMessage("OnDamage", playerUnit.skillDamage);
         }
     }
 }

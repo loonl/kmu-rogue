@@ -1,8 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+public enum WeaponType
+{
+    Melee = 0,
+    Bow = 1,
+    Staff = 2
+}
 
-public class PlayerPartsInit : MonoBehaviour
+public struct WeaponInfo
+{
+    public string info;
+    public WeaponType weapontype;
+    public float attackPower;
+    public float skillPower;
+    public float attackRange; // 0 ~ 25
+    public float skillRange;
+    public float cooltime; // skill cooltime
+    public WeaponInfo(string _info, WeaponType _weapontype, float _attackPower, float _skillPower, float _attackRange, float _skillRange, float _cooltime)
+    {
+        info = _info;
+        weapontype = _weapontype;
+        attackPower = _attackPower;
+        skillPower = _skillPower;
+        attackRange = _attackRange;
+        skillRange = _skillRange;
+        cooltime = _cooltime;
+    }
+}
+
+public struct ArmourInfo
+{
+    public string info;
+    public float extrahp;
+    public ArmourInfo(string _info, float _extrahp)
+    {
+        info = _info;
+        extrahp = _extrahp;
+    }
+}
+
+public class PlayerParts : MonoBehaviour
 {
     // path names
     string rootPath = "Assets/Resources/SPUM/SPUM_Sprites/";
@@ -37,123 +75,82 @@ public class PlayerPartsInit : MonoBehaviour
     string[] staff1 = { "Ward_1.png" };
     string[] staff3 = { "New_Weapon_03.png", "New_Weapon_18.png" };
     string[] shield2 = { "SteelShield1.png", "WoodShield1.png", "WoodShield2.png", "WoodShield3.png", "WoodShield4.png" };
+    string[] shield3 = { "New_Shield_01.png", "New_Shield_02.png", "New_Shield_03.png", "New_Shield_04.png" };
 
-    Player pl;
+    // parts lists
+    public List<ArmourInfo> helmetsList = new List<ArmourInfo>();
+    public List<ArmourInfo> armorsList = new List<ArmourInfo>();
+    public List<ArmourInfo> pantsList = new List<ArmourInfo>();
+    public List<WeaponInfo> weaponsList = new List<WeaponInfo>();
+    public List<ArmourInfo> shieldsList = new List<ArmourInfo>();
+
+    // called before start
+    private void Awake()
+    {
+        // helmet list init
+        for (int i = 0; i < helmet1.Length; i++)
+            helmetsList.Add(new ArmourInfo(rootPath + helmetPath1 + helmet1[i], 1.0f));
+
+        for (int i = 0; i < helmet2.Length; i++)
+            helmetsList.Add(new ArmourInfo(rootPath + helmetPath2 + helmet2[i], 1.0f));
+
+        for (int i = 0; i < helmet3.Length; i++)
+            helmetsList.Add(new ArmourInfo(rootPath + helmetPath3 + helmet3[i], 1.0f));
+
+        // armors list init
+        for (int i = 0; i < armor1.Length; i++)
+            armorsList.Add(new ArmourInfo(rootPath + armorPath1 + armor1[i], 1.0f));
+
+        for (int i = 0; i < armor2.Length; i++)
+            armorsList.Add(new ArmourInfo(rootPath + armorPath2 + armor2[i], 1.0f));
+
+        for (int i = 0; i < armor3.Length; i++)
+            armorsList.Add(new ArmourInfo(rootPath + armorPath3 + armor3[i], 1.0f));
+
+        // pants list init
+        for (int i = 0; i < pants1.Length; i++)
+            pantsList.Add(new ArmourInfo(rootPath + pantsPath1 + pants1[i], 1.0f));
+
+        for (int i = 0; i < pants2.Length; i++)
+            pantsList.Add(new ArmourInfo(rootPath + pantsPath2 + pants2[i], 1.0f));
+
+        // weapon list init
+        weaponsList.Add(new WeaponInfo("", WeaponType.Melee, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
+
+        for (int i = 0; i < melee1.Length; i++)
+            weaponsList.Add(new WeaponInfo(rootPath + weaponPath1 + melee1[i], WeaponType.Melee, 15.0f, 25.0f, 1.0f, 2.0f, 5.0f));
+
+        for (int i = 0; i < melee2.Length; i++)
+            weaponsList.Add(new WeaponInfo(rootPath + weaponPath2 + melee2[i], WeaponType.Melee, 20.0f, 30.0f, 3.0f, 5.0f, 10.0f));
+
+        for (int i = 0; i < melee3.Length; i++)
+            weaponsList.Add(new WeaponInfo(rootPath + weaponPath3 + melee3[i], WeaponType.Melee, 25.0f, 40.0f, 5.0f, 7.0f, 15.0f));
+
+        for (int i = 0; i < bow1.Length; i++)
+            weaponsList.Add(new WeaponInfo(rootPath + weaponPath1 + bow1[i], WeaponType.Bow, 15.0f, 25.0f, 1.0f, 2.0f, 5.0f));
+
+        for (int i = 0; i < bow3.Length; i++)
+            weaponsList.Add(new WeaponInfo(rootPath + weaponPath3 + bow3[i], WeaponType.Bow, 15.0f, 25.0f, 1.0f, 2.0f, 5.0f));
+
+        for (int i = 0; i < staff1.Length; i++)
+            weaponsList.Add(new WeaponInfo(rootPath + weaponPath1 + staff1[i], WeaponType.Staff, 15.0f, 25.0f, 1.0f, 2.0f, 5.0f));
+
+        for (int i = 0; i < staff3.Length; i++)
+            weaponsList.Add(new WeaponInfo(rootPath + weaponPath3 + staff3[i], WeaponType.Staff, 15.0f, 25.0f, 1.0f, 2.0f, 5.0f));
+
+        // shield list init
+        shieldsList.Add(new ArmourInfo("", 0.0f));
+
+        for (int i = 0; i < shield2.Length; i++)
+            shieldsList.Add(new ArmourInfo(rootPath + weaponPath2 + shield2[i], 1.0f));
+
+        for (int i = 0; i < shield3.Length; i++)
+            shieldsList.Add(new ArmourInfo(rootPath + weaponPath3 + shield3[i], 1.0f));
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        pl = GetComponent<Player>();
 
-        // helmet list init
-        for (int i = 0; i < helmet1.Length; i++)
-        {
-            pl.helmetsList.Add("," + rootPath + helmetPath1 + helmet1[i] + ",,");
-        }
-
-        for (int i = 0; i < helmet2.Length; i++)
-        {
-            pl.helmetsList.Add("," + rootPath + helmetPath2 + helmet2[i] + ",,");
-        }
-
-        for (int i = 0; i < helmet3.Length; i++)
-        {
-            pl.helmetsList.Add("," + rootPath + helmetPath3 + helmet3[i] + ",,");
-        }
-
-        // armor list init 
-        for (int i = 0; i < armor1.Length; i++)
-        {
-            string temp = rootPath + armorPath1 + armor1[i];
-            pl.armorsList.Add(temp + "," + temp + "," + temp);
-        }
-
-        for (int i = 0; i < armor2.Length; i++)
-        {
-            string temp = rootPath + armorPath2 + armor2[i];
-            pl.armorsList.Add(temp + "," + temp + "," + temp);
-        }
-
-        for (int i = 0; i < armor3.Length; i++)
-        {
-            string temp = rootPath + armorPath3 + armor3[i];
-            pl.armorsList.Add(temp + "," + temp + "," + temp);
-        }
-
-        // pants list init
-        for (int i = 0; i < pants1.Length; i++)
-        {
-            string temp = rootPath + pantsPath1 + pants1[i];
-            pl.pantsList.Add(temp + "," + temp);
-        }
-
-        for (int i = 0; i < pants2.Length; i++)
-        {
-            string temp = rootPath + pantsPath2 + pants2[i];
-            pl.pantsList.Add(temp + "," + temp);
-        }
-
-        // weapons list init - melee
-        for (int i = 0; i < melee1.Length; i++)
-        {
-            string wpnName = rootPath + weaponPath1 + melee1[i];
-            pl.weaponsList.Add(new WeaponInfo(wpnName + ",,,", WeaponType.Melee));
-
-            for (int j = 0; j < shield2.Length; j++)
-            {
-                string shldName = rootPath + weaponPath2 + shield2[j];
-                pl.weaponsList.Add(new WeaponInfo(wpnName + ",,," + shldName, WeaponType.Melee));
-            }
-        }
-
-        for (int i = 0; i < melee2.Length; i++)
-        {
-            string wpnName = rootPath + weaponPath2 + melee2[i];
-            pl.weaponsList.Add(new WeaponInfo(wpnName + ",,,", WeaponType.Melee));
-
-            for (int j = 0; j < shield2.Length; j++)
-            {
-                string shldName = rootPath + weaponPath2 + shield2[j];
-                pl.weaponsList.Add(new WeaponInfo(wpnName + ",,," + shldName, WeaponType.Melee));
-            }
-        }
-
-        for (int i = 0; i < melee3.Length; i++)
-        {
-            string wpnName = rootPath + weaponPath2 + melee3[i];
-            pl.weaponsList.Add(new WeaponInfo(wpnName + ",,,", WeaponType.Melee));
-
-            for (int j = 0; j < shield2.Length; j++)
-            {
-                string shldName = rootPath + weaponPath2 + shield2[j];
-                pl.weaponsList.Add(new WeaponInfo(wpnName + ",,," + shldName, WeaponType.Melee));
-            }
-        }
-
-        // weapons list init - bow
-        for (int i = 0; i < bow1.Length; i++)
-        {
-            string wpnName = rootPath + weaponPath1 + bow1[i];
-            pl.weaponsList.Add(new WeaponInfo(",," + wpnName + ",", WeaponType.Bow));
-        }
-
-        for (int i = 0; i < bow3.Length; i++)
-        {
-            string wpnName = rootPath + weaponPath3 + bow3[i];
-            pl.weaponsList.Add(new WeaponInfo(",," + wpnName + ",", WeaponType.Bow));
-        }
-
-        // weapons list init - staff
-        for (int i = 0; i < staff1.Length; i++)
-        {
-            string wpnName = rootPath + weaponPath1 + staff1[i];
-            pl.weaponsList.Add(new WeaponInfo(",," + wpnName + ",", WeaponType.Staff));
-        }
-
-        for (int i = 0; i < staff3.Length; i++)
-        {
-            string wpnName = rootPath + weaponPath3 + staff3[i];
-            pl.weaponsList.Add(new WeaponInfo(",," + wpnName + ",", WeaponType.Staff));
-        }
     }
 }
