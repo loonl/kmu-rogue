@@ -21,20 +21,32 @@ public class StageUIManager : MonoBehaviour
     float bossMaxHp;
     Monster curBoss;
 
+    GameObject backIMG;
+    GameObject statusFrame;
+    bool openStatus = false;
+
     // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
+        backIMG = GameObject.Find("BackPannel");
+        statusFrame = GameObject.Find("StatusFrame");
+
         coinTXT = coin.GetComponent<TextMeshProUGUI>();
 
         bossUI = GameObject.Find("BossHp");
-        bossHpbar = bossUI.GetComponent<Slider>();
-        bossUI.SetActive(false);
 
         playerUI = GameObject.Find("PlayerHp");
-        hpbar = playerUI.GetComponent<Slider>();
-        playerUI.SetActive(false);
 
         addCoin(0);
+    }
+    void Start()
+    {
+        bossHpbar = bossUI.GetComponent<Slider>();
+        hpbar = playerUI.GetComponent<Slider>();
+
+        backIMG.SetActive(false);
+        statusFrame.SetActive(false);
+        bossUI.SetActive(false);
     }
 
     // Update is called once per frame
@@ -48,6 +60,21 @@ public class StageUIManager : MonoBehaviour
         if (playerUI.activeSelf)
         {
             //hpbar.value = curhp.health / maxHp;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            openStatus = !openStatus;
+            backIMG.SetActive(openStatus);
+            statusFrame.SetActive(openStatus);
+            if (openStatus)
+            {
+                Time.timeScale = 1;
+            }
+            else
+            {
+                Time.timeScale = 0;
+            }
         }
     }
 
