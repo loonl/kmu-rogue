@@ -1,36 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 public class MonsterSpawner : MonoBehaviour
 {
-    public Monster monsterPrefab; // »ı¼ºÇÒ ¸ó½ºÅÍ Prefab
+    private Monster monsterPrefab; // ìƒì„±í•  ëª¬ìŠ¤í„° Prefab
 
-    public Transform[] spawnPoints; // ¼ÒÈ¯ À§Ä¡
+    public List<Vector3> spawnPoints; // ìŠ¤í° ìœ„ì¹˜
 
-    private List<Monster> monsters = new List<Monster>(); // »ı¼ºµÈ ¸ó½ºÅÍµéÀ» ´ã´Â ¸®½ºÆ®
+    private List<Monster> monsters = new List<Monster>(); // ìƒì„±ëœ ëª¬ìŠ¤í„°ë“¤ì„ ë‹´ëŠ” ë¦¬ìŠ¤íŠ¸
 
-    private void Start()
-    {
-        CreateEnemy();
-    }
+    //private void OnEnable()
+    //{
+    //    // ëª¬ìŠ¤í„° ìŠ¤í°
+    //    CreateEnemy();
+    //}
 
-    private void Update()
-    {
-
-    }
-
-    // ¸ó½ºÅÍ¸¦ »ı¼ºÇÏ°í ÃßÀûÇÒ ´ë»ó ÇÒ´ç
+    // ëª¬ìŠ¤í„°ë¥¼ ìƒì„±í•˜ê³  ì¶”ì í•  ëŒ€ìƒ í• ë‹¹
     private void CreateEnemy()
     {
-        for (int i = 0; i < spawnPoints.Length; i++)
+        foreach (Vector3 spawnPoint in spawnPoints)
         {
-            Transform spawnPoint = spawnPoints[i];
-            Monster monster = Instantiate(monsterPrefab, spawnPoint.position, spawnPoint.rotation);
+            // !!! ì¢€ë¹„ë§Œ ìŠ¤í°ë˜ê²Œ ì„¤ì •
+            Object monsterObj = Resources.Load("Prefabs/Dungeon/Zombie");
+            GameObject goMonster = Instantiate(monsterObj, spawnPoint, Quaternion.identity) as GameObject;
+            Monster monster = goMonster.GetComponent<Zombie>() as Monster;
 
             monsters.Add(monster);
             monster.onDeath += () => monsters.Remove(monster);
-            monster.onDeath += () => Destroy(monster.gameObject, 2f);
+            monster.onEliminate += () => Destroy(monster.gameObject);
+            monster.onRevive += () => monsters.Add(monster);
         }
+    }
+
+    public void Set(List<Vector3> spawnPositions)
+    {
+        spawnPoints = spawnPositions;
+        this.CreateEnemy();     // !!! temp
+    }
+
+    public void Spawn()
+    {
+
     }
 }
