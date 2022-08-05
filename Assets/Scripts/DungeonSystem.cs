@@ -14,23 +14,6 @@ public class DungeonSystem : MonoBehaviour
     [SerializeField]
     private int tempRoomCount;
 
-    // [Header ("Dungeon Size")]
-    // // [SerializeField]
-    // private int row;
-    // [SerializeField]
-    // private int col;
-
-    // [Header ("Room Size")]
-    // [SerializeField]
-    // private float roomWidth = 20f;
-
-    // [SerializeField]
-    // private GameObject spawnerParent;
-    
-    // // Spawner prefab
-    // [SerializeField]
-    // private GameObject spawnerPref;
-
     public int Floor { get { return floor; } }
 
     private void Awake()
@@ -70,9 +53,8 @@ public class DungeonSystem : MonoBehaviour
     // -------------------------------------------------------------
     public void CreateDungeon()
     {
-        // 맵 생성
-        generator.Generate(tempRoomCount);
-        // generator.GenerateWalls();
+        generator.Generate(tempRoomCount);      // 맵 생성
+        CreateSpawners();                       // 스포너 생성
     }
 
     public void ClearDungeon()
@@ -114,27 +96,18 @@ public class DungeonSystem : MonoBehaviour
     // -------------------------------------------------------------
     // 스포너 생성
     // -------------------------------------------------------------
-    // private void CreateSpawners(float percent, int maxCount = 1)
-    // {
-    //     // percent: Enemy가 나오는 방 비율
-    //     for (int i = 2; i < generator.Rooms.Count; i++)
-    //     {
-    //         // !!! 임시로 2번방부터 마지막 방까지 스포너 생성
-    //         if (Random.value < percent)
-    //         {
-    //             GameObject spawnerObject = Instantiate(
-    //                 spawnerPref,
-    //                 new Vector3(
-    //                     generator.Rooms[i].X * roomWidth,
-    //                     0f,
-    //                     generator.Rooms[i].Y * roomWidth
-    //                 ),
-    //                 Quaternion.identity
-    //             );
-    //             spawnerObject.name = i.ToString();
-    //             spawnerObject.transform.parent = spawnerParent.transform;
-    //             // spawnerObject.GetComponent<Spawner>().Set(gameManager, roomWidth, Random.Range(1, maxCount + 1), 30f);
-    //         }
-    //     }
-    // }
+    private void CreateSpawners()
+    {
+        //for (int i = 1; i < generator.Rooms.Count; i++)
+        foreach (DungeonRoom room in generator.Rooms)
+        {
+            // 0번 방에는 스포너를 안만듬
+            Object spawnerObject = Resources.Load("Prefabs/Dungeon/Spawner");
+            GameObject goSpawner = Instantiate(spawnerObject) as GameObject;
+            goSpawner.transform.SetParent(room.transform);
+
+            MonsterSpawner spawner = goSpawner.GetComponent<MonsterSpawner>();
+            room.SetSpawner(spawner);
+        }
+    }
 }
