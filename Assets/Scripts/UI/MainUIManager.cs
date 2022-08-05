@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Audio;
 
-public class GameManager : MonoBehaviour
+public class MainUIManager : MonoBehaviour
 {
     public GameObject FadeIMG;
     float fadeTime = 3f;
@@ -68,6 +68,6 @@ public class GameManager : MonoBehaviour
         }
         Debug.Log(1);
 
-        SceneManager.LoadScene("StageScene");
+        SceneManager.LoadScene("StageTest");
     }
 }
