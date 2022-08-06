@@ -4,15 +4,33 @@ using UnityEngine;
 
 public class ItemManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    private static List<Dictionary<string, object>> data;
+    private static ItemManager _instance = null;
+    public static ItemManager Instance
+    { 
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new ItemManager();
+            }
+
+            return _instance;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void TempGet(int itemId)
     {
-        
+        if (data == null)
+        {
+            data = CSVReader.Read("Datas/Item");
+        }
+        Debug.Log(data[itemId]["tempA"]);
+        Debug.Log(data[itemId]["tempB"]);
     }
+
+    //public static Item Get(int itemId)
+    //{
+    //    return;
+    //}
 }
