@@ -4,25 +4,38 @@ using UnityEngine;
 
 public class WeaponCollider : MonoBehaviour
 {
-    public Player PlayerUnit;
+    Player playerUnit;
+    ArcCollider2D arc;
+    public PolygonCollider2D poly;
+    public List<GameObject> monsters;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        playerUnit = transform.GetComponentInParent<Player>();
+        arc = GetComponent<ArcCollider2D>();
+        poly = GetComponent<PolygonCollider2D>();
+
+        poly.enabled = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void SetAttackRange(float value)
     {
-        if (collision.gameObject.tag == "Monster" && PlayerUnit.isAttacking)
+        arc.radius = value;
+    } 
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Monster" && playerUnit.isAttacking && !monsters.Contains(collision.gameObject))
         {
-            // 몬스터에게 데미지
-            collision.gameObject.SendMessage("OnDamage", PlayerUnit.damage);
+            monsters.Add(collision.gameObject);
+            // execute ondamage function when monster is in range
+            collision.gameObject.SendMessage("OnDamage", playerUnit.attackDamage);
         }
     }
 }
