@@ -1,0 +1,14 @@
+monsterId,Name,maxHealth,corpseHealth,damage,speed,scale
+1,Zombie1,100,50,,1,0.7
+2,Zombie2,200,100,,1,0.7
+3,Zombie3,300,150,,1,0.7
+4,FastZombie1,150,75,,1,0.7
+5,FastZombie2,300,150,,1,0.7
+6,FastZombie3,450,225,,1,0.7
+7,RevivalZombie1,200,100,,1,0.7
+8,RevivalZombie2,400,200,,1,0.7
+9,RevivalZombie3,700,300,,1,0.7
+10,RushZombie1,150,75,,1,0.7
+11,RushZombie2,300,150,,1,0.7
+12,RushZombie3,450,225,,1,0.7
+13,ZombieBoss,1000,100,,0.7,1

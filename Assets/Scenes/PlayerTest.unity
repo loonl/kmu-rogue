@@ -123,6 +123,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!58 &34463851 stripped
+CircleCollider2D:
+  m_CorrespondingSourceObject: {fileID: 699755735993520509, guid: 9e8507e92206aee4bac438b5ca5d5a2c, type: 3}
+  m_PrefabInstance: {fileID: 699755735721084419}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -262,6 +267,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerSkill_HitCircle
       objectReference: {fileID: 0}
+    - target: {fileID: 699755735993520515, guid: 9e8507e92206aee4bac438b5ca5d5a2c, type: 3}
+      propertyPath: circle
+      value: 
+      objectReference: {fileID: 34463851}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e8507e92206aee4bac438b5ca5d5a2c, type: 3}
 --- !u!1001 &6304550328200685585
