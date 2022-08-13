@@ -7,14 +7,12 @@ public class DungeonSystem : MonoBehaviour
     private static DungeonSystem instance = null;
     public static DungeonSystem Instance { get { return instance; } }
 
-    private int floor;
+    public int Floor { get; private set; } = 1;
 
     [SerializeField]
     private RoomGenerator generator;
     [SerializeField]
     private int tempRoomCount;
-
-    public int Floor { get { return floor; } }
 
     private void Awake()
     {
@@ -31,21 +29,7 @@ public class DungeonSystem : MonoBehaviour
     public void Load()
     {
         // 현재 Floor 기준으로 레벨 디자인
-        // !!! 레벨 디자인 클래스 만들기
         CreateDungeon();
-
-        // CreatePortal(0, false);
-        // CreatePortal(1, true);
-
-        // if (floor % 2 == 1)
-        // {
-        //     // 홀수 층은 스폰 율이 높음
-        //     CreateSpawners(0.8f, 2);
-        // }
-        // else
-        // {
-        //     CreateSpawners(1f);
-        // }
     }
 
     // -------------------------------------------------------------
@@ -53,15 +37,25 @@ public class DungeonSystem : MonoBehaviour
     // -------------------------------------------------------------
     public void CreateDungeon()
     {
-        generator.Generate(tempRoomCount);      // 맵 생성
-        CreateSpawners();                       // 스포너 생성
+        List<TileType> tileSeqence = new List<TileType>()
+        {
+            TileType.DefaultGround,
+            TileType.MossGround,
+            TileType.VineGround,
+            TileType.VineMossGround
+        };
+
+        // 맵 생성
+        generator.Generate(tempRoomCount, tileSeqence[(Floor - 1) % 4]);
+        // 스포너 생성
+        CreateSpawners();
+        // !!! 오브젝트 추가하기
     }
 
     public void ClearDungeon()
     {
         // 맵 삭제
         generator.Clear();
-        // generator.ClearWalls();
     }
 
     // -------------------------------------------------------------

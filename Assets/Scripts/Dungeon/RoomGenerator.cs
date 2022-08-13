@@ -35,6 +35,13 @@ public enum TileType
     VineMossCloseDoor = 28
 }
 
+public enum RoomSize
+{
+    Small,
+    Medium,
+    Big
+}
+
 public enum TileDirect
 {
     Default = 0,
@@ -97,11 +104,14 @@ public class RoomGenerator : MonoBehaviour
     private List<DungeonRoom> dungeonRooms;
 
     public List<DungeonRoom> Rooms { get { return dungeonRooms; } }
-    
+
+    private int shopIndex;
+
     private void Awake()
     {
         // default
         roomCount = 0;
+        shopIndex = 0;
         roomWidth = 20;
         rooms = new List<Room>();
         visitedRooms = new Stack<Room>();
@@ -111,27 +121,31 @@ public class RoomGenerator : MonoBehaviour
     // -------------------------------------------------------------
     // 던전 생성, 초기화
     // -------------------------------------------------------------
-    public void Generate(int maxCount)
+    public void Generate(int maxCount, TileType type)
     {
+        shopIndex = Mathf.FloorToInt(maxCount / 2f);
+
         // 빈 방 생성
         CreateEmptyRoom(maxCount);
 
-        // Temp
-        List<TileType> types = new List<TileType>() { 
-            TileType.DefaultGround,
-            TileType.MossGround,
-            TileType.VineGround,
-            TileType.VineMossGround
-        };
-
         // Room 타일 그리기
         DungeonRoom[] rooms = roomParent.GetComponentsInChildren<DungeonRoom>();
-        foreach (DungeonRoom room in rooms)
+
+        DrawRoom(rooms[0], type, RoomSize.Small);           // Start           
+
+        foreach (DungeonRoom room in rooms[1..shopIndex])
         {
-            // DrawRoom(room, TileType.DefaultGround, Random.Range(3, 20), Random.Range(3, 20));
-            DrawRoom(room, types[Random.Range(0, types.Count)], Random.Range(3, 20), Random.Range(3, 20));
-            // DrawRoom(room, types[Random.Range(0, types.Count)], 20, 20);
+           DrawRoom(room, type, RoomSize.Medium);
         }
+
+        DrawRoom(rooms[shopIndex], type, RoomSize.Small);           // Shop
+
+        foreach (DungeonRoom room in rooms[(shopIndex+1)..(rooms.Length - 1)])
+        {
+           DrawRoom(room, type, RoomSize.Medium);
+        }
+
+        DrawRoom(rooms[rooms.Length - 1], type, RoomSize.Big);      // Boss
 
         // 문 생성
         GenerateDoors(rooms);
@@ -152,7 +166,7 @@ public class RoomGenerator : MonoBehaviour
         visitedRooms.Clear();
     }
 
-    private void CreateEmptyRoom(int maxCount = 10)
+    private void CreateEmptyRoom(int maxCount)
     {
         roomCount = 0;
         maxRoomCount = maxCount;
@@ -248,8 +262,40 @@ public class RoomGenerator : MonoBehaviour
 
     
     // 타일 그리기
-    private void DrawRoom(DungeonRoom room, TileType type, int rows, int cols)
+    private void DrawRoom(DungeonRoom room, TileType type, RoomSize size = RoomSize.Small)
     {
+        // Default small size
+        int rows = 7;
+        int cols = 7;
+
+        if (size == RoomSize.Medium)
+        {
+            // 75% - (9, 9)
+            if (Random.value < 0.75)
+            {
+                rows = 9;
+                cols = 9;
+            }
+            else
+            {
+                if (Random.value < 0.5)
+                {
+                    rows = 9;
+                    cols = 15;
+                }
+                else
+                {
+                    rows = 15;
+                    cols = 9;
+                }
+            }
+        }
+        else if (size == RoomSize.Big)
+        {
+            rows = 13;
+            cols = 13;
+        }
+
         ushort indexTileType = (ushort)type;
         // 타입은 Ground 타입을 지정하면 됨
         // row x col 크기의 방 생성
