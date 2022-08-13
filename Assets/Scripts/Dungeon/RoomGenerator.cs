@@ -148,7 +148,7 @@ public class RoomGenerator : MonoBehaviour
         DrawRoom(rooms[rooms.Length - 1], type, RoomSize.Big);      // Boss
 
         // 문 생성
-        GenerateDoors(rooms);
+        GenerateDoors(rooms, type);
     }
 
     public void Clear()
@@ -341,7 +341,7 @@ public class RoomGenerator : MonoBehaviour
         room.TileMapParent.transform.localPosition -= tileMapSize * room.WallLayer.cellSize.x * 0.5f;
     }
 
-    private void GenerateDoors(DungeonRoom[] dungeonRooms)
+    private void GenerateDoors(DungeonRoom[] dungeonRooms, TileType type)
     {
         for (int roomIndex = 0; roomIndex < rooms.Count; roomIndex++)
         {
@@ -370,9 +370,29 @@ public class RoomGenerator : MonoBehaviour
                         break;
                 }
 
+                TileType closeDoor = TileType.DefaultCloseDoor;
+                TileType openDoor = TileType.DefaultOpenDoor;
+
+                switch (type)
+                {
+                    case TileType.MossGround:
+                        closeDoor = TileType.MossCloseDoor;
+                        openDoor = TileType.MossOpenDoor;
+                        break;
+                    case TileType.VineGround:
+                        closeDoor = TileType.VineCloseDoor;
+                        openDoor = TileType.VineOpenDoor;
+                        break;
+                    case TileType.VineMossGround:
+                        closeDoor = TileType.VineMossCloseDoor;
+                        openDoor = TileType.VineMossOpenDoor;
+                        break;
+                }
+
                 // 포탈 생성 및 연결
-                DrawTile(dungeonRooms[roomIndex].ObjectLayer, TileType.DefaultCloseDoor, (TileDirect)(ushort)direct, centerDoorPos);
-                
+                DrawTile(dungeonRooms[roomIndex].CloseDoorLayer, closeDoor, (TileDirect)(ushort)direct, centerDoorPos);
+                DrawTile(dungeonRooms[roomIndex].OpenDoorLayer, openDoor, (TileDirect)(ushort)direct, centerDoorPos);
+
                 GameObject portalObject = Instantiate(portalPref);
                 portalObject.transform.parent = dungeonRooms[roomIndex].transform;
                 // DrawTile로 그려진 위치로 portalPref 위치 조정 (room start pos + door pos + offset)
