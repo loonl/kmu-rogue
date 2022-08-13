@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,5 +24,21 @@ public class GameManager : MonoBehaviour
     {
         ItemManager.Instance.TempGet(0);
         ItemManager.Instance.TempGet(1);
+    }
+
+    // -------------------------------------------------------------
+    // Player 아이템 착용 / 해제
+    // -------------------------------------------------------------
+    public void Equip()
+    {
+        // 플레이어 스탯 수정
+        // 플레이어 외형 수정
+
+        // 장착 슬롯에 아이템 추가
+    }
+
+    public void UnEquip()
+    {
+        // ...
     }
 }
