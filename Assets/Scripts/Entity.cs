@@ -8,8 +8,8 @@ public class Entity : MonoBehaviour {
     public bool dead = false; // 사망 상태
     public event Action onDeath; // 사망 시 발동 이벤트
 
-    // 생명체가 활성화될때 상태 초기화
     protected virtual void OnEnable() {
+        // 피조물이 활성화될 때 상태 초기화
         dead = false;
         health = maxHealth;
     }

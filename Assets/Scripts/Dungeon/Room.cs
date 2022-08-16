@@ -6,6 +6,7 @@ public class Room
 {
     private int _x;      // 가로 축
     private int _y;      // 세로 축
+    public int Id { get; private set; }        // Room ID
 
     private List<RoomDirect> emptyDirects;
     private List<RoomDirect> existDirects;
@@ -20,10 +21,6 @@ public class Room
     public int Y { get { return _y; } set { _y = value; } }
     public List<RoomDirect> EmptyDirects { get { return emptyDirects; } }
     public List<RoomDirect> ExistDirects { get { return existDirects; } }
-    public Room Top { get { return top; } }
-    public Room Right { get { return right; } }
-    public Room Down { get { return down; } }
-    public Room Left { get { return left; } }
 
     public GameObject RoomObject { get { return roomObject; } }
 
@@ -34,14 +31,16 @@ public class Room
     {
         _x = 0;
         _y = 0;
+        Id = 0;
         emptyDirects = new List<RoomDirect>() { RoomDirect.Top, RoomDirect.Right, RoomDirect.Down, RoomDirect.Left };
         existDirects = new List<RoomDirect>();
     }
 
-    public Room(int x, int y)
+    public Room(int x, int y, int roomId)
     {
         _x = x;
         _y = y;
+        Id = roomId;
         emptyDirects = new List<RoomDirect>() { RoomDirect.Top, RoomDirect.Right, RoomDirect.Down, RoomDirect.Left };
         existDirects = new List<RoomDirect>();
     }
@@ -124,5 +123,25 @@ public class Room
     public void SetRoomObject(GameObject room)
     {
         roomObject = room;
+    }
+
+    public int GetConnectedRoomId(ushort roomDirect)
+    {
+        if (roomDirect == 0)
+        {
+            return top.Id;
+        }
+        else if (roomDirect == 1)
+        {
+            return right.Id;
+        }
+        else if (roomDirect == 2)
+        {
+            return down.Id;
+        }
+        else
+        {
+            return left.Id;
+        }
     }
 }

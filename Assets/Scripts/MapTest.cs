@@ -4,20 +4,16 @@ using UnityEngine;
 
 public class MapTest : MonoBehaviour
 {
-    [SerializeField]
-    private DungeonSystem dungeonSystem;
-
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            dungeonSystem.ClearDungeon();
+            DungeonSystem.Instance.ClearDungeon();
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            dungeonSystem.ClearDungeon();
-            dungeonSystem.CreateDungeon();
+            DungeonSystem.Instance.ClearDungeon();
+            DungeonSystem.Instance.CreateDungeon();
         }
     }
 }
