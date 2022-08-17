@@ -1647,12 +1647,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a681db42a8b690b458a1fd5249c212cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dead: 0
   deathSound: {fileID: 0}
   hitSound: {fileID: 0}
-  corpseHealth: 75
-  damage: 20
-  speed: 1
+  idNumber: 12
+  dead: 0
 --- !u!1 &4616083264600162395
 GameObject:
   m_ObjectHideFlags: 0

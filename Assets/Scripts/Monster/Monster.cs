@@ -1,36 +1,38 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class Monster: MonoBehaviour
 {
+    protected Animator animator;
+    protected AudioSource audioPlayer;
+    protected Rigidbody2D rigidbody2d;
+    protected CapsuleCollider2D capsuleCollider2d;
+    protected CircleCollider2D circleCollider2d;
+
     public AudioClip deathSound; // 사망시 재생 소리
     public AudioClip hitSound; // 피격시 재생 소리
 
-    protected Animator animator; // 애니메이터 컴포넌트
-    protected AudioSource audioPlayer; // 오디오 소스 컴포넌트
-    protected Rigidbody2D rigidbody2d; // 리지드바디 컴포넌트
-    protected CapsuleCollider2D capsuleCollider2d; // 캡슐콜라이더 컴포넌트
-    protected CircleCollider2D circleCollider2d; //서클콜라이더 컴포넌트
-
-    protected float scale; // 스케일
-    public float maxHealth = 100f; // 최대 체력
+    public int idNumber; // 아이디 넘버
+    protected float scale; // 크기
+    protected float maxHealth; // 최대 체력
     protected float health; // 현재 체력
-    public float corpseHealth = 75f; // 시체 체력
-    public float damage = 20f; // 공격력
-    public float speed = 1f; // 이동 속도
+    protected float corpseHealth; // 시체 체력
+    protected float damage; // 공격력
+    protected float speed; // 이동 속도
+
     protected float attackCoolTime = 0.5f; // 공격 쿨타임
     protected float lastAttackTime; // 마지막 공격 시점
-
     public bool dead = false; // 사망 상태
-    public string action; // 현재 수행 중인 상태
+    protected string action; // 현재 수행 중인 상태
     protected Entity targetEntity; // 추적 대상
     protected Vector2 direction; // 경로 방향
 
     public event Action onDeath; // 사망 시 발동 이벤트
     public event Action onRevive; // 부활 시 발동 이벤트
     public event Action onEliminate; // 시체제거 시 발동 이벤트
-
     // 추적 대상의 존재 여부
     protected bool hasTarget
     {
@@ -51,23 +53,36 @@ public class Monster: MonoBehaviour
         rigidbody2d = GetComponent<Rigidbody2D>();
         animator = GetComponentInChildren<Animator>();
         audioPlayer = GetComponent<AudioSource>();
+
+        
+    }
+    protected void Start()
+    {
+        SetUp(); // 몬스터 초기화
+        Generate(); // 몬스터 생성
     }
 
-    // 몬스터 초기화
-    protected virtual void Setup()
+    // csv파일을 이용하여 몬스터 초기화
+    protected void SetUp()
     {
-        scale = transform.localScale.x;
+        string path = "Datas/Monster";
+        List<Dictionary<string, object>> data = CSVReader.Read(path);
+
+        scale = float.Parse(data[idNumber]["Scale"].ToString());
+        maxHealth = float.Parse(data[idNumber]["MaxHealth"].ToString());
+        corpseHealth = float.Parse(data[idNumber]["CorpseHealth"].ToString());
+        damage = float.Parse(data[idNumber]["Damage"].ToString());
+        speed = float.Parse(data[idNumber]["Speed"].ToString());
+    }
+
+    // 몬스터 활성화
+    protected virtual void Generate()
+    {
         health = maxHealth;
         dead = false;
         action = "moving";
         StartCoroutine(UpdatePath());
         StartCoroutine(Moving());
-    }
-
-    protected void Start()
-    {
-        // 몬스터 초기화
-        Setup();
     }
 
     // 경로 갱신
@@ -106,7 +121,6 @@ public class Monster: MonoBehaviour
     {
         while (!dead && action == "moving")
         {
-            Debug.Log("movig");
             rigidbody2d.velocity = direction * speed;
             yield return new WaitForSeconds(0.05f);
         }
@@ -178,7 +192,7 @@ public class Monster: MonoBehaviour
         }
 
         maxHealth = (float)Math.Ceiling(maxHealth * 2 / 3);
-        Setup();
+        Generate();
 
         animator.SetTrigger("Revive");
     }

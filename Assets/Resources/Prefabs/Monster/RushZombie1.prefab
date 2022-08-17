@@ -395,13 +395,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b30662998c504cf4ba067369edf8796c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dead: 0
   deathSound: {fileID: 0}
   hitSound: {fileID: 0}
-  corpseHealth: 75
-  damage: 20
-  speed: 1
-  attackCoolTime: 1
+  idNumber: 9
+  dead: 0
 --- !u!1 &444055369237554467
 GameObject:
   m_ObjectHideFlags: 0
