@@ -238,6 +238,11 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8829481273125761732, guid: 2181a29c3a82f41469d278119e9437e6, type: 3}
   m_PrefabInstance: {fileID: 1661685473}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &469250124 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4962552525574343034, guid: 9cff9503b45222144bcbb92fabb42331, type: 3}
+  m_PrefabInstance: {fileID: 1776113457}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -744,9 +749,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4962552526835318052, guid: 9cff9503b45222144bcbb92fabb42331, type: 3}
+      propertyPath: monsterPrefab
+      value: 
+      objectReference: {fileID: 4286653788150504434, guid: 1ef2b5c704bded849b536c50df5c2208, type: 3}
+    - target: {fileID: 4962552526835318052, guid: 9cff9503b45222144bcbb92fabb42331, type: 3}
+      propertyPath: spawnPointsTest.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4962552526835318052, guid: 9cff9503b45222144bcbb92fabb42331, type: 3}
+      propertyPath: spawnPointsTest.Array.data[0]
+      value: 
+      objectReference: {fileID: 469250124}
     - target: {fileID: 4962552526835318053, guid: 9cff9503b45222144bcbb92fabb42331, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4962552526835318053, guid: 9cff9503b45222144bcbb92fabb42331, type: 3}
       propertyPath: m_LocalPosition.x
@@ -836,7 +853,7 @@ Transform:
   - {fileID: 4652299611827229989}
   - {fileID: 353828391}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1858582808
 PrefabInstance:
