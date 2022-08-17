@@ -19,18 +19,13 @@ public class ItemManager : MonoBehaviour
         }
     }
 
-    public void TempGet(int itemId)
+    public Item GetItem(int itemId)
     {
         if (data == null)
         {
             data = CSVReader.Read("Datas/Item");
         }
-        Debug.Log(data[itemId]["tempA"]);
-        Debug.Log(data[itemId]["tempB"]);
-    }
 
-    //public static Item Get(int itemId)
-    //{
-    //    return;
-    //}
+        return new Item(data[itemId]);
+    }
 }
