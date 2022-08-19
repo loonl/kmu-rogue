@@ -49,8 +49,8 @@ public class DungeonSystem : MonoBehaviour
 
         // 맵 생성
         generator.Generate(tempRoomCount, tileSeqence[(Floor - 1) % 4]);
-        // 스포너 생성
-        CreateSpawners();
+        CreateSpawners();   // 스포너 생성
+        CreateShop();       // 상점 생성
     }
 
     public void ClearDungeon()
@@ -68,12 +68,20 @@ public class DungeonSystem : MonoBehaviour
         // foreach (DungeonRoom room in generator.Rooms)
         {
             // 0번 방에는 스포너를 안만듬
-            Object spawnerObject = Resources.Load("Prefabs/Dungeon/Spawner");
-            GameObject goSpawner = Instantiate(spawnerObject) as GameObject;
-            goSpawner.transform.SetParent(generator.Rooms[i].transform);
-
+            GameObject goSpawner = GameManager.Instance.CreateGO("Prefabs/Dungeon/Spawner", generator.Rooms[i].transform);
             MonsterSpawner spawner = goSpawner.GetComponent<MonsterSpawner>();
             generator.Rooms[i].SetSpawner(spawner, i);
         }
+    }
+
+    // -------------------------------------------------------------
+    // 상점 생성
+    // -------------------------------------------------------------
+    private void CreateShop()
+    {
+        DungeonRoom shop = generator.Shop;
+        
+        // DroppedItem 생성
+        // GameManager.Instance.CreateGo("Prefabs/Dungeon/DroppedItem", shop.transform);
     }
 }

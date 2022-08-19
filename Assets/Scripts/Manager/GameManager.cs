@@ -41,4 +41,16 @@ public class GameManager : MonoBehaviour
     {
         // ...
     }
+
+    // -------------------------------------------------------------
+    // 프리팹 생성
+    // -------------------------------------------------------------
+    public GameObject CreateGO(string url, Transform parent)
+    {
+        Object obj = Resources.Load(url);
+        GameObject go = Instantiate(obj) as GameObject;
+        go.transform.SetParent(parent);
+        
+        return go;
+    }
 }

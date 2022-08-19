@@ -22,9 +22,9 @@ public class MonsterSpawner : MonoBehaviour
         foreach (Vector3 spawnPoint in spawnPoints)
         {
             // !!! 좀비만 스폰되게 설정
-            Object monsterObj = Resources.Load("Prefabs/Dungeon/Zombie");
-            GameObject goMonster = Instantiate(monsterObj, spawnPoint, Quaternion.identity) as GameObject;
-            Monster monster = goMonster.GetComponent<Zombie>() as Monster;
+            GameObject enemy = GameManager.Instance.CreateGO("Prefabs/Dungeon/Zombie", this.transform);
+            enemy.transform.position = spawnPoint;
+            Monster monster = enemy.GetComponent<Zombie>() as Monster;
 
             monsters.Add(monster);
             monster.onDeath += () =>
