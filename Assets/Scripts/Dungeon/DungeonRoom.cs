@@ -36,8 +36,8 @@ public class DungeonRoom : MonoBehaviour
     {
         // 플레이어 입장
         Portals[(outDirect + 2) % 4].Enter(player);
-        // _spawner.Spawn();
-        this.Clear();      // !!! temp
+        _spawner.Spawn();
+        // this.Clear();      // !!! temp
     }
 
     public void Clear()
@@ -56,7 +56,7 @@ public class DungeonRoom : MonoBehaviour
         OpenDoorLayer.gameObject.SetActive(true);
     }
 
-    public void SetSpawner(MonsterSpawner spawner)
+    public void SetSpawner(MonsterSpawner spawner, int roomIndex)
     {
         _spawner = spawner;
         List<Vector3> spots = new List<Vector3>();
@@ -75,7 +75,7 @@ public class DungeonRoom : MonoBehaviour
             spots.Add(this.transform.position + diff);
         }
 
-        _spawner.Set(spots);
+        _spawner.Set(spots, roomIndex);
         //_spawner.CreateEnemy
     }
 }

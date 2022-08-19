@@ -51,7 +51,6 @@ public class DungeonSystem : MonoBehaviour
         generator.Generate(tempRoomCount, tileSeqence[(Floor - 1) % 4]);
         // 스포너 생성
         CreateSpawners();
-        // !!! 오브젝트 추가하기
     }
 
     public void ClearDungeon()
@@ -74,7 +73,7 @@ public class DungeonSystem : MonoBehaviour
             goSpawner.transform.SetParent(generator.Rooms[i].transform);
 
             MonsterSpawner spawner = goSpawner.GetComponent<MonsterSpawner>();
-            generator.Rooms[i].SetSpawner(spawner);
+            generator.Rooms[i].SetSpawner(spawner, i);
         }
     }
 }

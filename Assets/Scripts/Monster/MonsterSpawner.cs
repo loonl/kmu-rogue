@@ -9,6 +9,7 @@ public class MonsterSpawner : MonoBehaviour
 
     private List<Monster> monsters = new List<Monster>(); // 생성된 몬스터들을 담는 리스트
 
+    private int _roomIndex;
     //private void OnEnable()
     //{
     //    // 몬스터 스폰
@@ -26,19 +27,32 @@ public class MonsterSpawner : MonoBehaviour
             Monster monster = goMonster.GetComponent<Zombie>() as Monster;
 
             monsters.Add(monster);
-            monster.onDeath += () => monsters.Remove(monster);
+            monster.onDeath += () =>
+            {
+                monsters.Remove(monster);
+                CheckRemainEnemy();
+            };
             monster.onEliminate += () => Destroy(monster.gameObject);
             monster.onRevive += () => monsters.Add(monster);
         }
     }
 
-    public void Set(List<Vector3> spawnPositions)
+    public void Set(List<Vector3> spawnPositions, int roomIndex)
     {
         spawnPoints = spawnPositions;
+        _roomIndex = roomIndex;
     }
 
     public void Spawn()
     {
         this.CreateEnemy();
+    }
+
+    private void CheckRemainEnemy()
+    {
+        if (monsters.Count < 1)
+        {
+            DungeonSystem.Instance.Rooms[_roomIndex].Clear();
+        }
     }
 }
