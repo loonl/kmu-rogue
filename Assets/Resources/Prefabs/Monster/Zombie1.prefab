@@ -2516,9 +2516,9 @@ GameObject:
   - component: {fileID: 1942759041250978851}
   - component: {fileID: 6252834546880932661}
   - component: {fileID: 4927969009119793913}
-  - component: {fileID: 737925145716563325}
+  - component: {fileID: 4286653788150504434}
   m_Layer: 0
-  m_Name: Zombie
+  m_Name: Zombie1
   m_TagString: Monster
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2533,7 +2533,7 @@ RectTransform:
   m_GameObject: {fileID: 5148159909380461712}
   m_LocalRotation: {x: 0, y: 0.008726558, z: 0, w: 0.999962}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5455356662978897197}
@@ -2604,7 +2604,7 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0.2}
   m_Size: {x: 0.3, y: 0.4}
   m_Direction: 0
---- !u!114 &737925145716563325
+--- !u!114 &4286653788150504434
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2619,6 +2619,10 @@ MonoBehaviour:
   dead: 0
   deathSound: {fileID: 0}
   hitSound: {fileID: 0}
+  corpseHealth: 75
+  damage: 20
+  speed: 1
+  attackCoolTime: 1
 --- !u!1 &5245307644295478559
 GameObject:
   m_ObjectHideFlags: 0
@@ -2989,7 +2993,7 @@ Transform:
   m_GameObject: {fileID: 5784280113539198408}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8433569642200473864}

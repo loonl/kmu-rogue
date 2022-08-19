@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class MonsterSpawner : MonoBehaviour
 {
-    private Monster monsterPrefab; // 생성할 몬스터 Prefab
+    public Monster monsterPrefab; // 생성할 몬스터 Prefab
 
     public List<Vector3> spawnPoints; // 스폰 위치
 
