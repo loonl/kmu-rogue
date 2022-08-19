@@ -243,7 +243,7 @@ public class Player : MonoBehaviour {
     //    }
     //}
 
-    public void OnDamage(int damage)
+    public void OnDamage(float damage)
     {
         stat.Damaged(damage);
 

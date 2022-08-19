@@ -12,8 +12,8 @@ public class Item : MonoBehaviour
     public Item(Dictionary<string, object> data)
     {
         name = (string) data["name"];
-        stat = new Stat((int)data["hp"], (int)data["dmg"], (int)data["range"], 
-                        (int)data["skilldmg"], (int)data["cooltime"], (int)data["speed"]);
+        stat = new Stat(float.Parse(data["hp"].ToString()), float.Parse(data["dmg"].ToString()), float.Parse(data["range"].ToString()), 
+                        float.Parse(data["skilldmg"].ToString()), float.Parse(data["cooltime"].ToString()), float.Parse(data["speed"].ToString()));
         itemType = (int) data["type"];
         path = (string) data["path"];
     } 

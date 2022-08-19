@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class Stat
 {
-    public int hp { get; set; }
-    public int maxHp { get; set; }
+    public float hp { get; set; }
+    public float maxHp { get; set; }
 
-    public int damage { get; set; }
+    public float damage { get; set; }
     public float range { get; set; }
-    public int skillDamage { get; set; }
+    public float skillDamage { get; set; }
     public float coolTime { get; set; }
 
     public float speed { get; set; }
@@ -17,27 +17,27 @@ public class Stat
     {
         if (!empty)
         {
-            maxHp = 100;
-            hp = 100;
-            damage = 0;
+            maxHp = 100f;
+            hp = 100f;
+            damage = 0f;
             range = 0;
-            skillDamage = 0;
+            skillDamage = 0f;
             coolTime = 0f;
             speed = 2f;
         }
         else
         {
-            maxHp = 0;
-            hp = 0;
-            damage = 0;
-            range = 0;
-            skillDamage = 0;
+            maxHp = 0f;
+            hp = 0f;
+            damage = 0f;
+            range = 0f;
+            skillDamage = 0f;
             coolTime = 0f;
             speed = 0f;
         }
     }
 
-    public Stat(int _hp, int _damage, int _range, int _skillDamage, int _coolTime, int _speed)
+    public Stat(float _hp, float _damage, float _range, float _skillDamage, float _coolTime, float _speed)
     {
         maxHp = _hp;
         hp = _hp;
@@ -76,18 +76,18 @@ public class Stat
         }
     }
 
-    public void SyncHP(int _hp, int _maxHp)
+    public void SyncHP(float _hp, float _maxHp)
     {
         hp = _hp;
         maxHp = _maxHp;
     }
 
-    public void Damaged(int amount)
+    public void Damaged(float amount)
     {
         hp = Mathf.Clamp(hp - amount, 0, maxHp);
     }
 
-    public void Recover(int amount)
+    public void Recover(float amount)
     {
         hp = Mathf.Clamp(hp + amount, 0, maxHp);
     }
