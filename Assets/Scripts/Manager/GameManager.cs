@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,8 +22,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        ItemManager.Instance.TempGet(0);
-        ItemManager.Instance.TempGet(1);
+        DungeonSystem.Instance.CreateDungeon();
+        DungeonSystem.Instance.Rooms[0].Clear();    // 첫번째 방은 클리어 된 상태
     }
 
     // -------------------------------------------------------------
