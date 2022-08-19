@@ -1,31 +1,38 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
-public class Monster : Entity
+public class Monster: MonoBehaviour
 {
+    protected Animator animator;
+    protected AudioSource audioPlayer;
+    protected Rigidbody2D rigidbody2d;
+    protected CapsuleCollider2D capsuleCollider2d;
+    protected CircleCollider2D circleCollider2d;
+
     public AudioClip deathSound; // 사망시 재생 소리
     public AudioClip hitSound; // 피격시 재생 소리
 
-    protected Animator animator; // 애니메이터 컴포넌트
-    protected AudioSource audioPlayer; // 오디오 소스 컴포넌트
-    protected Rigidbody2D rigidbody2d; // 리지드바디 컴포넌트
-    protected CapsuleCollider2D capsuleCollider2d; // 캡슐콜라이더 컴포넌트
-    protected CircleCollider2D circleCollider2d; //서클콜라이더 컴포넌트
-
+    public int idNumber; // 아이디 넘버
+    protected float scale; // 크기
+    protected float maxHealth; // 최대 체력
+    protected float health; // 현재 체력
     protected float corpseHealth; // 시체 체력
-    protected float damage ; // 공격력
+    protected float damage; // 공격력
     protected float speed; // 이동 속도
-    protected float attackCoolTime = 1f; // 공격 쿨타임
-    protected float lastAttackTime; // 마지막 공격 시점
 
+    protected float attackCoolTime = 0.5f; // 공격 쿨타임
+    protected float lastAttackTime; // 마지막 공격 시점
+    public bool dead = false; // 사망 상태
+    protected string action; // 현재 수행 중인 상태
     protected Entity targetEntity; // 추적 대상
     protected Vector2 direction; // 경로 방향
-    protected string action = "moving"; // 현재 행동
 
+    public event Action onDeath; // 사망 시 발동 이벤트
     public event Action onRevive; // 부활 시 발동 이벤트
     public event Action onEliminate; // 시체제거 시 발동 이벤트
-
     // 추적 대상의 존재 여부
     protected bool hasTarget
     {
@@ -47,34 +54,35 @@ public class Monster : Entity
         animator = GetComponentInChildren<Animator>();
         audioPlayer = GetComponent<AudioSource>();
 
-        // 몬스터의 스텟 초기화
-        Setup();
-    }
-
-    protected override void OnEnable()
-    {
         
     }
-
     protected void Start()
     {
-        Setup();
+        SetUp(); // 몬스터 초기화
+        Generate(); // 몬스터 생성
     }
 
-    protected virtual void Update()
+    // csv파일을 이용하여 몬스터 초기화
+    protected void SetUp()
     {
-        // 현재 행동 수행
-        if (dead)  // **플레이어 사망여부 추가
-        {
-            rigidbody2d.velocity = Vector2.zero;
-        }
-        else if (action == "moving")
-        {
-            Moving();
-        }
+        string path = "Datas/Monster";
+        List<Dictionary<string, object>> data = CSVReader.Read(path);
 
-        // 추적 대상의 존재 여부에 따라 다른 애니메이션을 재생
-        animator.SetBool("HasTarget", hasTarget);
+        scale = float.Parse(data[idNumber]["Scale"].ToString());
+        maxHealth = float.Parse(data[idNumber]["MaxHealth"].ToString());
+        corpseHealth = float.Parse(data[idNumber]["CorpseHealth"].ToString());
+        damage = float.Parse(data[idNumber]["Damage"].ToString());
+        speed = float.Parse(data[idNumber]["Speed"].ToString());
+    }
+
+    // 몬스터 활성화
+    protected virtual void Generate()
+    {
+        health = maxHealth;
+        dead = false;
+        action = "moving";
+        StartCoroutine(UpdatePath());
+        StartCoroutine(Moving());
     }
 
     // 경로 갱신
@@ -84,33 +92,52 @@ public class Monster : Entity
         {
             if (hasTarget)
             {
-                if (targetEntity.transform.position.x - transform.position.x > 0)
+                direction = (targetEntity.transform.position - transform.position).normalized;
+
+                if (direction.x > 0)
                 {
-                    transform.localScale = new Vector3(-1f, 1f, 1f);
+
+                    transform.localScale = new Vector3(-scale, scale, scale);
                 }
                 else
                 {
-                    transform.localScale = new Vector3(1f, 1f, 1f);
+                    transform.localScale = new Vector3(scale, scale, scale);
                 }
 
-                direction = (targetEntity.transform.position - transform.position).normalized;
+                animator.SetBool("HasTarget", hasTarget);
             }
             else 
             {
                 targetEntity = GameObject.FindGameObjectWithTag("Player").GetComponent<Entity>();
+                animator.SetBool("HasTarget", hasTarget);
             }
+
             yield return new WaitForSeconds(0.1f);
         }
     }
 
-    // 이동 수행
-    protected virtual void Moving()
+    // 이동 상태 수행
+    protected virtual IEnumerator Moving()
     {
-        rigidbody2d.velocity = direction * speed;
+        while (!dead && action == "moving")
+        {
+            rigidbody2d.velocity = direction * speed;
+            yield return new WaitForSeconds(0.05f);
+        }
+    }
+
+    // 시체 상태 수행
+    protected virtual IEnumerator Dying()
+    {
+        while (dead)
+        {
+            rigidbody2d.velocity = Vector2.zero;
+            yield return new WaitForSeconds(0.05f);
+        }
     }
 
     // 피격 처리
-    public override void OnDamage(float damage)
+    public void OnDamage(float damage)
     {
         health -= damage;
 
@@ -132,10 +159,16 @@ public class Monster : Entity
     }
 
     // 사망 처리
-    public override void Die()
+    public virtual void Die()
     {
-        base.Die();
+        if (onDeath != null)
+        {
+            onDeath();
+        }
+
+        dead = true;
         health = corpseHealth;
+        StartCoroutine(Dying());
 
         animator.SetTrigger("Die");
         //audioPlayer.PlayOneShot(deathSound);
@@ -158,7 +191,8 @@ public class Monster : Entity
             onRevive();
         }
 
-        Setup();
+        maxHealth = (float)Math.Ceiling(maxHealth * 2 / 3);
+        Generate();
 
         animator.SetTrigger("Revive");
     }
@@ -173,22 +207,14 @@ public class Monster : Entity
         // 충돌한 게임 오브젝트가 추적 대상이라면 공격
         if (Time.time >= lastAttackTime + attackCoolTime)
         {
-            Entity attackTarget = other.gameObject.GetComponent<Entity>();
+            Player attackTarget = other.gameObject.GetComponent<Player>();
 
             if (attackTarget != null && attackTarget == targetEntity)
             {
                 lastAttackTime = Time.time;
-
                 attackTarget.OnDamage(damage);
+                animator.SetTrigger("Attack_Normal");
             }
         }
-    }
-
-    // 몬스터 초기화
-    protected virtual void Setup() {
-        health = maxHealth;
-        dead = false;
-        action = "moving";
-        StartCoroutine(UpdatePath());
     }
 }
