@@ -2,28 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : Entity {
+public class Player : MonoBehaviour {
     // player stat variables
-    public float speed;
-    public float attackDamage;
-    public float skillDamage;
+    public Stat stat = new Stat(false);
     public bool isAttacking;
     public float remainCool;
+    public bool dead;
 
-    // equipments
-    public WeaponInfo curWeapon; // used in weaponcollider.cs
-    ArmourInfo curShield;
-    ArmourInfo curArmor;
-    ArmourInfo curPants;
-    ArmourInfo curHelmet;
+    // equipments => 0 : Weapon, 1 : Helmet, 2 : Armor, 3 : Pants, 4 : Shield
+    public List<Item> equipment;
 
     Animator anim;
     WeaponCollider wpnColl;
-    SPUM_SpriteList spumMgr;
     Rigidbody2D rig;
-    PlayerParts parts;
-    PlayerSkillCollider skillColl;
-    Camera cam;
+    public SPUM_SpriteList spumMgr;
 
     void Start()
     {
@@ -31,9 +23,19 @@ public class Player : Entity {
         wpnColl = transform.GetChild(0).gameObject.GetComponent<WeaponCollider>();
         spumMgr = transform.GetChild(0).GetChild(0).GetComponent<SPUM_SpriteList>();
         rig = GetComponent<Rigidbody2D>();
-        parts = GetComponent<PlayerParts>();
-        skillColl = GameObject.Find("PlayerSkill_HitCircle").GetComponent<PlayerSkillCollider>();
-        cam = GameObject.Find("Main Camera").GetComponent<Camera>();
+
+        // player's first equipments (플레이어 첫 장비)
+        equipment = new List<Item> { ItemManager.Instance.GetItem(0), // sword
+                                     ItemManager.Instance.GetItem(35), // helmet
+                                     ItemManager.Instance.GetItem(57), // armor
+                                     ItemManager.Instance.GetItem(78), // pants
+                                     ItemManager.Instance.GetItem(94)  // shield
+                                    };
+
+        for (int i = 0; i < equipment.Count; i++)
+        {
+            GameManager.Instance.Equip(equipment[i]);
+        }
 
         // used in animator end event - death
         anim.GetComponent<PlayerAnimreciver>().onDieComplete = () =>
@@ -64,37 +66,16 @@ public class Player : Entity {
             // enable re-attack
             isAttacking = false;
 
-            // disable skill collider
-            skillColl.circle.enabled = false;
-
             // reset elasped skill cool-time
-            remainCool = curWeapon.cooltime;
-
-            // clear skill collider monster list
-            if (skillColl.monsters.Count > 0)
-            {
-                skillColl.monsters.Clear();
-            }
+            remainCool = equipment[0].stat.coolTime;
         };
 
-        // first equipment init
-        curWeapon = parts.weaponsList[1];
-        curShield = parts.shieldsList[1];
-        curHelmet = parts.helmetsList[1];
-        curArmor = parts.armorsList[1];
-        curPants = parts.pantsList[1];
-
         // player stat variables init
-        maxHealth = 100.0f + curShield.extrahp + curHelmet.extrahp + curArmor.extrahp + curPants.extrahp;
-        health = maxHealth;
-        attackDamage = 1.0f + curWeapon.attackPower;
-        skillDamage = curWeapon.skillPower;
-        speed = 2.5f;
-        remainCool = -1.0f;
+        dead = false;
+        remainCool = -1f;
 
         // attack & skill range init
-        wpnColl.SetAttackRange(curWeapon.attackRange);
-        skillColl.SetAttackRange(curWeapon.skillRange);
+        wpnColl.SetAttackRange(equipment[0].stat.range);
     }
 
     void Update()
@@ -119,48 +100,21 @@ public class Player : Entity {
         }
 
         // change character's position
-        rig.velocity = moveInput * speed;
+        rig.velocity = moveInput * stat.speed;
 
         // change animation depending on speed
-        anim.SetFloat("Speed", moveInput.magnitude * speed);
+        anim.SetFloat("Speed", moveInput.magnitude * stat.speed);
 
 
         /**
         * Input Handling
         */
 
-        // test PlayerChange
-        // 0 = Helmet, 1 = Armor, 2 = Pants, 3 = Shields, 4 = Weapons
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            ChangePlayerParts(0, parts.helmetsList.IndexOf(curHelmet) + 1);
-        } 
-
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            ChangePlayerParts(1, parts.armorsList.IndexOf(curArmor) + 1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            ChangePlayerParts(2, parts.pantsList.IndexOf(curPants) + 1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            ChangePlayerParts(3, parts.shieldsList.IndexOf(curShield) + 1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            ChangePlayerParts(4, parts.weaponsList.IndexOf(curWeapon) + 1);
-        }
-
         // Attack Input
         if (Input.GetButtonDown("Fire1") && !isAttacking)
         {
             // update weapon state
-            anim.SetInteger("WpnState", (int)curWeapon.weapontype);
+            anim.SetInteger("WpnState", equipment[0].itemType);
 
             // change animation to attack
             anim.SetTrigger("Attack");
@@ -168,13 +122,6 @@ public class Player : Entity {
 
             // enable weapon collider
             wpnColl.poly.enabled = true;
-        }
-
-        // test onDamage
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            print("onDamageTest");
-            OnDamage(25.0f);
         }
 
         // test debugging skill cool-time
@@ -187,7 +134,7 @@ public class Player : Entity {
         if (Input.GetButtonDown("Fire2") && remainCool <= 0.0f && !isAttacking)
         {
             // update weapon state
-            anim.SetInteger("WpnState", (int)curWeapon.weapontype);
+            anim.SetInteger("WpnState", equipment[0].itemType);
 
             // change animation to skill
             anim.SetTrigger("Skill");
@@ -195,119 +142,124 @@ public class Player : Entity {
             // do not let attack and use skill at the same time
             isAttacking = true;
 
-            // track mouse position and locate skill collider there
-            Vector2 mousePos = Input.mousePosition;
-            mousePos = cam.ScreenToWorldPoint(mousePos);
-            skillColl.transform.position = mousePos;
+            // TO-DO
+            // 스킬 관련 구현
+        }
 
-            // enable skill collider
-            skillColl.circle.enabled = true;
+        // test code - change equipments
+        if (Input.GetKeyDown(KeyCode.G)) // helmet
+            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(35, 56)));
+
+        if (Input.GetKeyDown(KeyCode.H)) // armor
+            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(57, 77)));
+
+        if (Input.GetKeyDown(KeyCode.J)) // pants
+            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(78, 93)));
+
+        if (Input.GetKeyDown(KeyCode.K)) // shield
+            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(94, 103)));
+
+        if (Input.GetKeyDown(KeyCode.B)) // sword
+            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(1, 14)));
+
+        if (Input.GetKeyDown(KeyCode.N)) // bow
+            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(28, 31)));
+
+        if (Input.GetKeyDown(KeyCode.M)) // staff
+            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(32, 34)));
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            print("MaxHP : " + stat.maxHp + "\nHP : " + stat.hp + "\nAttackPower : " + stat.damage
+               + "\nAttackRange : " + stat.range + "\nSkillPower : " + stat.skillDamage
+               + "\nSpeed : " + stat.speed + "\nCoolTime : " + stat.coolTime);
         }
     }
 
     // change player's equipment parts
-    private void ChangePlayerParts(int ver, int index)
+    //private void ChangePlayerParts(int ver, int index)
+    //{
+    //    switch (ver)
+    //    {
+    //        case 0: // helmet
+    //            // change info & re-sync data
+    //            spumMgr._hairListString[1] = parts.helmetsList[index].info;
+    //            curHelmet = parts.helmetsList[index];
+    //            UpdateHP();
+    //            spumMgr.SyncPath(spumMgr._hairList, spumMgr._hairListString);
+    //            break;
+
+    //        case 1: // armors
+    //            // change info & re-sync data
+    //            spumMgr._armorListString[0] = spumMgr._armorListString[1] =
+    //                spumMgr._armorListString[2] = parts.armorsList[index].info;
+    //            curArmor = parts.armorsList[index];
+    //            UpdateHP();
+    //            spumMgr.SyncPath(spumMgr._armorList, spumMgr._armorListString);
+    //            break;
+
+    //        case 2: // pants
+    //            // change info & re-sync data
+    //            spumMgr._pantListString[0] = spumMgr._pantListString[1] =
+    //                parts.pantsList[index].info;
+    //            curPants = parts.pantsList[index];
+    //            UpdateHP();
+    //            spumMgr.SyncPath(spumMgr._pantList, spumMgr._pantListString);
+    //            break;
+
+    //        case 3: // shield
+    //            // change info & re-sync data
+    //            spumMgr._weaponListString[3] = parts.shieldsList[index].info;
+    //            curShield = parts.shieldsList[index];
+
+    //            // if player is equipping left-handed weapons, then un-equip
+    //            if (spumMgr._weaponListString[2] != "")
+    //            {
+    //                curWeapon = parts.weaponsList[0];
+    //                spumMgr._weaponListString[2] = "";
+    //            }
+
+    //            UpdateHP();
+    //            spumMgr.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
+    //            break;
+
+    //        case 4: // weapon
+    //            // weapon depends on weapon_type 
+    //            WeaponInfo nextWeapon = parts.weaponsList[index];
+    //            if (nextWeapon.weapontype == WeaponType.Melee)
+    //                spumMgr._weaponListString[0] = nextWeapon.info;
+    //            else // if weapon type == bow or staff
+    //            {
+    //                spumMgr._weaponListString[0] = ""; // un-equip right hand weapon
+    //                spumMgr._weaponListString[3] = ""; // cannot equip shields
+    //                curShield = parts.shieldsList[0];
+    //                spumMgr._weaponListString[2] = nextWeapon.info;
+    //            }
+
+    //            curWeapon = parts.weaponsList[index];
+    //            UpdateStats();
+    //            spumMgr.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
+    //            break;
+    //    }
+    //}
+
+    public void OnDamage(int damage)
     {
-        switch (ver)
-        {
-            case 0: // helmet
-                // change info & re-sync data
-                spumMgr._hairListString[1] = parts.helmetsList[index].info;
-                curHelmet = parts.helmetsList[index];
-                UpdateHP();
-                spumMgr.SyncPath(spumMgr._hairList, spumMgr._hairListString);
-                break;
+        stat.Damaged(damage);
 
-            case 1: // armors
-                // change info & re-sync data
-                spumMgr._armorListString[0] = spumMgr._armorListString[1] =
-                    spumMgr._armorListString[2] = parts.armorsList[index].info;
-                curArmor = parts.armorsList[index];
-                UpdateHP();
-                spumMgr.SyncPath(spumMgr._armorList, spumMgr._armorListString);
-                break;
-
-            case 2: // pants
-                // change info & re-sync data
-                spumMgr._pantListString[0] = spumMgr._pantListString[1] =
-                    parts.pantsList[index].info;
-                curPants = parts.pantsList[index];
-                UpdateHP();
-                spumMgr.SyncPath(spumMgr._pantList, spumMgr._pantListString);
-                break;
-
-            case 3: // shield
-                // change info & re-sync data
-                spumMgr._weaponListString[3] = parts.shieldsList[index].info;
-                curShield = parts.shieldsList[index];
-
-                // if player is equipping left-handed weapons, then un-equip
-                if (spumMgr._weaponListString[2] != "")
-                {
-                    curWeapon = parts.weaponsList[0];
-                    spumMgr._weaponListString[2] = "";
-                }
-
-                UpdateHP();
-                spumMgr.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
-                break;
-
-            case 4: // weapon
-                // weapon depends on weapon_type 
-                WeaponInfo nextWeapon = parts.weaponsList[index];
-                if (nextWeapon.weapontype == WeaponType.Melee)
-                    spumMgr._weaponListString[0] = nextWeapon.info;
-                else // if weapon type == bow or staff
-                {
-                    spumMgr._weaponListString[0] = ""; // un-equip right hand weapon
-                    spumMgr._weaponListString[3] = ""; // cannot equip shields
-                    curShield = parts.shieldsList[0];
-                    spumMgr._weaponListString[2] = nextWeapon.info;
-                }
-
-                curWeapon = parts.weaponsList[index];
-                UpdateStats();
-                spumMgr.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
-                break;
-        }
-    }
-
-    // update player stats & skill ranges
-    private void UpdateStats()
-    {
-        attackDamage = 1.0f + curWeapon.attackPower;
-        skillDamage = curWeapon.skillPower;
-        wpnColl.SetAttackRange(curWeapon.attackRange);
-        skillColl.SetAttackRange(curWeapon.skillRange);
-    }
-
-    // update max hp when armour is changed
-    private void UpdateHP()
-    {
-        maxHealth = 100.0f + curShield.extrahp + curHelmet.extrahp + curArmor.extrahp + curPants.extrahp;
-        if (health > maxHealth)
-            health = maxHealth;
-    }
-
-    public override void OnDamage(float damage)
-    {
-        base.OnDamage(damage);
-
-        // adjust health to 0 if minus
-        if (health < 0f)
-            health = 0f;
+        // trigger die if health is below 0
+        if (stat.hp == 0)
+            Die();
 
         // change animation to stunned
         anim.SetTrigger("Hit");
 
         // debug
-        print("Player's health : " + health);
+        print("Player's health : " + stat.hp);
     }
 
-    public override void Die()
+    public void Die()
     {
-        base.Die();
-
         // change animation to death
         anim.SetTrigger("Die");
     }
