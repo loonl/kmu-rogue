@@ -99,6 +99,10 @@ public class RoomGenerator : MonoBehaviour
     [SerializeField]
     private GameObject portalPref;
     
+    [Header ("Object")]
+    [SerializeField]
+    private GameObject boxesPref;
+
     private List<Room> rooms;            // 모든 방 리스트
     private Stack<Room> visitedRooms;
     private List<DungeonRoom> dungeonRooms;
@@ -106,6 +110,8 @@ public class RoomGenerator : MonoBehaviour
     public List<DungeonRoom> Rooms { get { return dungeonRooms; } }
 
     private int shopIndex;
+
+    public DungeonRoom Shop { get { return dungeonRooms[shopIndex]; } }
 
     private void Awake()
     {
@@ -149,6 +155,9 @@ public class RoomGenerator : MonoBehaviour
 
         // 문 생성
         GenerateDoors(rooms, type);
+
+        // 오브젝트 생성
+        GenerateObject(rooms);
     }
 
     public void Clear()
@@ -166,6 +175,9 @@ public class RoomGenerator : MonoBehaviour
         visitedRooms.Clear();
     }
 
+    // -------------------------------------------------------------
+    // Empty room 생성 및 연결
+    // -------------------------------------------------------------
     private void CreateEmptyRoom(int maxCount)
     {
         roomCount = 0;
@@ -260,8 +272,9 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
-    
-    // 타일 그리기
+    // -------------------------------------------------------------
+    // 방 생성 (room, door, object)
+    // -------------------------------------------------------------
     private void DrawRoom(DungeonRoom room, TileType type, RoomSize size = RoomSize.Small)
     {
         // Default small size
@@ -408,6 +421,58 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
+    private void GenerateObject(DungeonRoom[] rooms)
+    {
+        foreach (DungeonRoom room in rooms)
+        {
+            float x = room.GroundLayer.size.x - 1;
+            float y = room.GroundLayer.size.y - 1;
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (Random.value > 0.5)
+                {
+                    continue;
+                }
+
+                int boxCount = Random.Range(1, 4);
+                GameObject boxes = Instantiate(boxesPref);
+                boxes.transform.SetParent(room.ObjectParent.transform);
+                boxes.GetComponent<Boxes>().Set(boxCount, (RoomDirect)i);
+
+                float z = boxes.transform.position.z;
+                Vector3 offset;
+
+                switch ((RoomDirect)i)
+                {
+                    case RoomDirect.Top:
+                        offset = new Vector3(0.5f, -0.5f, 0f);
+                        boxes.transform.localPosition = new Vector3(x * -0.5f, y * 0.5f, z) + offset;
+                        break;
+                    case RoomDirect.Right:
+                        offset = new Vector3(-0.35f, -0.5f, 0f);
+                        boxes.transform.localPosition = new Vector3(x * 0.5f, y * 0.5f, z) + offset;
+                        boxes.transform.rotation = Quaternion.Euler(0, 0, 270);
+                        break;
+                    case RoomDirect.Down:
+                        offset = new Vector3(-0.35f, 0.5f, 0f);
+                        boxes.transform.localPosition = new Vector3(x * 0.5f, y * -0.5f, z) + offset;
+                        boxes.transform.rotation = Quaternion.Euler(0, 0, 180);
+                        break;
+                    case RoomDirect.Left:
+                        offset = new Vector3(0.5f, 0.5f, 0f);
+                        boxes.transform.localPosition = new Vector3(x * -0.5f, y * -0.5f, z) + offset;
+                        boxes.transform.rotation = Quaternion.Euler(0, 0, 90);
+                        break;
+                }
+            }
+            
+        }
+    }
+
+    // -------------------------------------------------------------
+    // 타일 그리기
+    // -------------------------------------------------------------
     private void DrawTile(Tilemap tileMap, TileType type, TileDirect direct, Vector3Int pos)
     {
         Tile tile = null;

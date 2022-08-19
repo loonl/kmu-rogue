@@ -14,6 +14,8 @@ public class DungeonSystem : MonoBehaviour
     [SerializeField]
     private int tempRoomCount;
 
+    public List<DungeonRoom> Rooms { get { return generator.Rooms; } }
+
     private void Awake()
     {
         if (instance == null)
@@ -47,9 +49,8 @@ public class DungeonSystem : MonoBehaviour
 
         // 맵 생성
         generator.Generate(tempRoomCount, tileSeqence[(Floor - 1) % 4]);
-        // 스포너 생성
-        CreateSpawners();
-        // !!! 오브젝트 추가하기
+        CreateSpawners();   // 스포너 생성
+        CreateShop();       // 상점 생성
     }
 
     public void ClearDungeon()
@@ -59,49 +60,28 @@ public class DungeonSystem : MonoBehaviour
     }
 
     // -------------------------------------------------------------
-    // 포탈
-    // -------------------------------------------------------------
-    public Vector3 GetTargetPortalPos(int dungeonRoomIndex, ushort direct)
-    {
-        // 연결된 방의 반대 방향 direct 문 위치로 이동
-        Vector3 offset;
-
-        if (direct == 0)
-        {
-            offset = new Vector3(0, 1f, 0);
-        }
-        else if (direct == 1)
-        {
-            offset = new Vector3(1f, 0, 0);
-        }
-        else if (direct == 2)
-        {
-            offset = new Vector3(0, -1f, 0);
-        }
-        else
-        {
-            offset = new Vector3(-1f, 0, 0);
-        }
-
-        generator.Rooms[dungeonRoomIndex].Portals[(direct + 2) % 4].DeActivate();   // !!! temp
-        return generator.Rooms[dungeonRoomIndex].Portals[(direct + 2) % 4].transform.position + offset * 0.5f;
-    }
-
-    // -------------------------------------------------------------
     // 스포너 생성
     // -------------------------------------------------------------
     private void CreateSpawners()
     {
-        //for (int i = 1; i < generator.Rooms.Count; i++)
-        foreach (DungeonRoom room in generator.Rooms)
+        for (int i = 1; i < generator.Rooms.Count; i++)
+        // foreach (DungeonRoom room in generator.Rooms)
         {
             // 0번 방에는 스포너를 안만듬
-            Object spawnerObject = Resources.Load("Prefabs/Dungeon/Spawner");
-            GameObject goSpawner = Instantiate(spawnerObject) as GameObject;
-            goSpawner.transform.SetParent(room.transform);
-
+            GameObject goSpawner = GameManager.Instance.CreateGO("Prefabs/Dungeon/Spawner", generator.Rooms[i].transform);
             MonsterSpawner spawner = goSpawner.GetComponent<MonsterSpawner>();
-            room.SetSpawner(spawner);
+            generator.Rooms[i].SetSpawner(spawner, i);
         }
+    }
+
+    // -------------------------------------------------------------
+    // 상점 생성
+    // -------------------------------------------------------------
+    private void CreateShop()
+    {
+        DungeonRoom shop = generator.Shop;
+        
+        // DroppedItem 생성
+        // GameManager.Instance.CreateGo("Prefabs/Dungeon/DroppedItem", shop.transform);
     }
 }
