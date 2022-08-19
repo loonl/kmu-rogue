@@ -9,17 +9,11 @@ public class StageUIManager : MonoBehaviour
 {
     GameObject playerUI;
     public Slider hpbar;
-    public float maxHp;
-    public Player curhp;
-
-    public GameObject coin;
-    TextMeshProUGUI coinTXT;
-    int curCoin = 0;
+    public Entity playerInfo;
 
     GameObject bossUI;
     Slider bossHpbar;
-    float bossMaxHp;
-    Monster curBoss;
+    Entity curBoss;
 
     GameObject backIMG;
     GameObject statusFrame;
@@ -30,19 +24,15 @@ public class StageUIManager : MonoBehaviour
     {
         backIMG = GameObject.Find("BackPannel");
         statusFrame = GameObject.Find("StatusFrame");
-
-        coinTXT = coin.GetComponent<TextMeshProUGUI>();
-
         bossUI = GameObject.Find("BossHp");
-
         playerUI = GameObject.Find("PlayerHp");
 
-        addCoin(0);
     }
     void Start()
     {
         bossHpbar = bossUI.GetComponent<Slider>();
         hpbar = playerUI.GetComponent<Slider>();
+        playerInfo = GameObject.Find("Player").GetComponent<Player>();
 
         backIMG.SetActive(false);
         statusFrame.SetActive(false);
@@ -54,46 +44,38 @@ public class StageUIManager : MonoBehaviour
     {
         if (bossUI.activeSelf)
         {
-            //bossHpbar.value = curBoss.health / bossMaxHp;
+            bossHpbar.value = curBoss.GetHP() / curBoss.GetMaxHP();
         }
 
         if (playerUI.activeSelf)
         {
-            //hpbar.value = curhp.health / maxHp;
+            hpbar.value = playerInfo.GetHP() / playerInfo.GetMaxHP();
         }
 
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.Escape))
         {
-            openStatus = !openStatus;
-            backIMG.SetActive(openStatus);
-            statusFrame.SetActive(openStatus);
-            if (openStatus)
-            {
-                Time.timeScale = 1;
-            }
-            else
-            {
-                Time.timeScale = 0;
-            }
+            RoadStatus();
         }
     }
 
-    public void RoadBossUI(float maxhp, Monster boss)
+    public void RoadBossUI(Monster boss)
     {
         curBoss = boss.GetComponent<Monster>();
         bossUI.SetActive(true);
-        bossMaxHp = maxHp;
-    }
-    public void RoadPlayerUI(float maxPlayerHP, Player player)
-    {
-        curhp = player.GetComponent<Player>();
-        playerUI.SetActive(true);
-        maxHp = maxPlayerHP;
     }
 
-    public void addCoin(int coin)
+    public void RoadStatus()
     {
-        curCoin += coin;
-        coinTXT.text = curCoin.ToString();
+        openStatus = !openStatus;
+        backIMG.SetActive(openStatus);
+        statusFrame.SetActive(openStatus);
+        if (openStatus)
+        {
+            Time.timeScale = 0;
+        }
+        else
+        {
+            Time.timeScale = 1;
+        }
     }
 }
