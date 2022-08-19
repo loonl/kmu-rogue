@@ -19,11 +19,6 @@ public class WeaponCollider : MonoBehaviour
         poly.enabled = false;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-    }
-
     public void SetAttackRange(float value)
     {
         arc.radius = value;
@@ -35,7 +30,7 @@ public class WeaponCollider : MonoBehaviour
         {
             monsters.Add(collision.gameObject);
             // execute ondamage function when monster is in range
-            collision.gameObject.SendMessage("OnDamage", playerUnit.attackDamage);
+            collision.gameObject.SendMessage("OnDamage", playerUnit.stat.damage);
         }
     }
 }

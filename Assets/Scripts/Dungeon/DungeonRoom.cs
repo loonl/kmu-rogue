@@ -13,26 +13,50 @@ public class DungeonRoom : MonoBehaviour
     private Tilemap _wallLayer;
     [SerializeField]
     private Tilemap _objectLayer;
+    [SerializeField]
+    private Tilemap _closeDoorLayer;
+    [SerializeField]
+    private Tilemap _openDoorLayer;
+    [SerializeField]
+    public GameObject ObjectParent;
 
     public Tilemap GroundLayer { get { return _groundLayer; } }
     public Tilemap WallLayer { get { return _wallLayer; } }
     public Tilemap ObjectLayer { get { return _objectLayer; } }
+    public Tilemap CloseDoorLayer { get { return _closeDoorLayer; } }
+    public Tilemap OpenDoorLayer { get { return _openDoorLayer; } }
 
     public Portal[] Portals = new Portal[] { null, null, null, null };
 
     private MonsterSpawner _spawner = null;
 
-    public void Enter()
+    public bool IsClear { get; private set; }
+
+    public void Enter(ushort outDirect, GameObject player)
     {
-        // «√∑π¿ÃæÓ ¿‘¿Â
+        // ÌîåÎ†àÏù¥Ïñ¥ ÏûÖÏû•
+        Portals[(outDirect + 2) % 4].Enter(player);
+        _spawner.Spawn();
+        // this.Clear();      // !!! temp
     }
 
-    public void ClearDungeonRoom()
+    public void Clear()
     {
-        // πÊ ≈¨∏ÆæÓ
+        // Î∞© ÌÅ¥Î¶¨Ïñ¥
+        this.IsClear = true;
+        foreach (Portal portal in Portals)
+        {
+            if (portal != null)
+            {
+                portal.Activate();
+            }
+        }
+
+        CloseDoorLayer.gameObject.SetActive(false);
+        OpenDoorLayer.gameObject.SetActive(true);
     }
 
-    public void SetSpawner(MonsterSpawner spawner)
+    public void SetSpawner(MonsterSpawner spawner, int roomIndex)
     {
         _spawner = spawner;
         List<Vector3> spots = new List<Vector3>();
@@ -41,7 +65,7 @@ public class DungeonRoom : MonoBehaviour
 
         for (int i = 0; i < 5; i++)
         {
-            // !!! 5∏∂∏Æ∏∏ Ω∫∆˘
+            // !!! 5ÎßàÎ¶¨Îßå Ïä§Ìè∞
             Vector3 diff = new Vector3(
                 Random.Range(-1 * horizontalRange, horizontalRange),
                 Random.Range(-1 * verticalRange, verticalRange),
@@ -51,7 +75,7 @@ public class DungeonRoom : MonoBehaviour
             spots.Add(this.transform.position + diff);
         }
 
-        _spawner.Set(spots);
+        _spawner.Set(spots, roomIndex);
         //_spawner.CreateEnemy
     }
 }

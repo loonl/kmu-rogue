@@ -35,6 +35,13 @@ public enum TileType
     VineMossCloseDoor = 28
 }
 
+public enum RoomSize
+{
+    Small,
+    Medium,
+    Big
+}
+
 public enum TileDirect
 {
     Default = 0,
@@ -92,16 +99,25 @@ public class RoomGenerator : MonoBehaviour
     [SerializeField]
     private GameObject portalPref;
     
+    [Header ("Object")]
+    [SerializeField]
+    private GameObject boxesPref;
+
     private List<Room> rooms;            // 모든 방 리스트
     private Stack<Room> visitedRooms;
     private List<DungeonRoom> dungeonRooms;
 
     public List<DungeonRoom> Rooms { get { return dungeonRooms; } }
-    
+
+    private int shopIndex;
+
+    public DungeonRoom Shop { get { return dungeonRooms[shopIndex]; } }
+
     private void Awake()
     {
         // default
         roomCount = 0;
+        shopIndex = 0;
         roomWidth = 20;
         rooms = new List<Room>();
         visitedRooms = new Stack<Room>();
@@ -111,30 +127,37 @@ public class RoomGenerator : MonoBehaviour
     // -------------------------------------------------------------
     // 던전 생성, 초기화
     // -------------------------------------------------------------
-    public void Generate(int maxCount)
+    public void Generate(int maxCount, TileType type)
     {
+        shopIndex = Mathf.FloorToInt(maxCount / 2f);
+
         // 빈 방 생성
         CreateEmptyRoom(maxCount);
 
-        // Temp
-        List<TileType> types = new List<TileType>() { 
-            TileType.DefaultGround,
-            TileType.MossGround,
-            TileType.VineGround,
-            TileType.VineMossGround
-        };
-
         // Room 타일 그리기
         DungeonRoom[] rooms = roomParent.GetComponentsInChildren<DungeonRoom>();
-        foreach (DungeonRoom room in rooms)
+
+        DrawRoom(rooms[0], type, RoomSize.Small);           // Start           
+
+        foreach (DungeonRoom room in rooms[1..shopIndex])
         {
-            // DrawRoom(room, TileType.DefaultGround, Random.Range(3, 20), Random.Range(3, 20));
-            DrawRoom(room, types[Random.Range(0, types.Count)], Random.Range(3, 20), Random.Range(3, 20));
-            // DrawRoom(room, types[Random.Range(0, types.Count)], 20, 20);
+           DrawRoom(room, type, RoomSize.Medium);
         }
 
+        DrawRoom(rooms[shopIndex], type, RoomSize.Small);           // Shop
+
+        foreach (DungeonRoom room in rooms[(shopIndex+1)..(rooms.Length - 1)])
+        {
+           DrawRoom(room, type, RoomSize.Medium);
+        }
+
+        DrawRoom(rooms[rooms.Length - 1], type, RoomSize.Big);      // Boss
+
         // 문 생성
-        GenerateDoors(rooms);
+        GenerateDoors(rooms, type);
+
+        // 오브젝트 생성
+        GenerateObject(rooms);
     }
 
     public void Clear()
@@ -152,7 +175,10 @@ public class RoomGenerator : MonoBehaviour
         visitedRooms.Clear();
     }
 
-    private void CreateEmptyRoom(int maxCount = 10)
+    // -------------------------------------------------------------
+    // Empty room 생성 및 연결
+    // -------------------------------------------------------------
+    private void CreateEmptyRoom(int maxCount)
     {
         roomCount = 0;
         maxRoomCount = maxCount;
@@ -246,10 +272,43 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
-    
-    // 타일 그리기
-    private void DrawRoom(DungeonRoom room, TileType type, int rows, int cols)
+    // -------------------------------------------------------------
+    // 방 생성 (room, door, object)
+    // -------------------------------------------------------------
+    private void DrawRoom(DungeonRoom room, TileType type, RoomSize size = RoomSize.Small)
     {
+        // Default small size
+        int rows = 7;
+        int cols = 7;
+
+        if (size == RoomSize.Medium)
+        {
+            // 75% - (9, 9)
+            if (Random.value < 0.75)
+            {
+                rows = 9;
+                cols = 9;
+            }
+            else
+            {
+                if (Random.value < 0.5)
+                {
+                    rows = 9;
+                    cols = 15;
+                }
+                else
+                {
+                    rows = 15;
+                    cols = 9;
+                }
+            }
+        }
+        else if (size == RoomSize.Big)
+        {
+            rows = 13;
+            cols = 13;
+        }
+
         ushort indexTileType = (ushort)type;
         // 타입은 Ground 타입을 지정하면 됨
         // row x col 크기의 방 생성
@@ -295,7 +354,7 @@ public class RoomGenerator : MonoBehaviour
         room.TileMapParent.transform.localPosition -= tileMapSize * room.WallLayer.cellSize.x * 0.5f;
     }
 
-    private void GenerateDoors(DungeonRoom[] dungeonRooms)
+    private void GenerateDoors(DungeonRoom[] dungeonRooms, TileType type)
     {
         for (int roomIndex = 0; roomIndex < rooms.Count; roomIndex++)
         {
@@ -324,9 +383,29 @@ public class RoomGenerator : MonoBehaviour
                         break;
                 }
 
+                TileType closeDoor = TileType.DefaultCloseDoor;
+                TileType openDoor = TileType.DefaultOpenDoor;
+
+                switch (type)
+                {
+                    case TileType.MossGround:
+                        closeDoor = TileType.MossCloseDoor;
+                        openDoor = TileType.MossOpenDoor;
+                        break;
+                    case TileType.VineGround:
+                        closeDoor = TileType.VineCloseDoor;
+                        openDoor = TileType.VineOpenDoor;
+                        break;
+                    case TileType.VineMossGround:
+                        closeDoor = TileType.VineMossCloseDoor;
+                        openDoor = TileType.VineMossOpenDoor;
+                        break;
+                }
+
                 // 포탈 생성 및 연결
-                DrawTile(dungeonRooms[roomIndex].ObjectLayer, TileType.DefaultCloseDoor, (TileDirect)(ushort)direct, centerDoorPos);
-                
+                DrawTile(dungeonRooms[roomIndex].CloseDoorLayer, closeDoor, (TileDirect)(ushort)direct, centerDoorPos);
+                DrawTile(dungeonRooms[roomIndex].OpenDoorLayer, openDoor, (TileDirect)(ushort)direct, centerDoorPos);
+
                 GameObject portalObject = Instantiate(portalPref);
                 portalObject.transform.parent = dungeonRooms[roomIndex].transform;
                 // DrawTile로 그려진 위치로 portalPref 위치 조정 (room start pos + door pos + offset)
@@ -342,6 +421,58 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
+    private void GenerateObject(DungeonRoom[] rooms)
+    {
+        foreach (DungeonRoom room in rooms)
+        {
+            float x = room.GroundLayer.size.x - 1;
+            float y = room.GroundLayer.size.y - 1;
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (Random.value > 0.5)
+                {
+                    continue;
+                }
+
+                int boxCount = Random.Range(1, 4);
+                GameObject boxes = Instantiate(boxesPref);
+                boxes.transform.SetParent(room.ObjectParent.transform);
+                boxes.GetComponent<Boxes>().Set(boxCount, (RoomDirect)i);
+
+                float z = boxes.transform.position.z;
+                Vector3 offset;
+
+                switch ((RoomDirect)i)
+                {
+                    case RoomDirect.Top:
+                        offset = new Vector3(0.5f, -0.5f, 0f);
+                        boxes.transform.localPosition = new Vector3(x * -0.5f, y * 0.5f, z) + offset;
+                        break;
+                    case RoomDirect.Right:
+                        offset = new Vector3(-0.35f, -0.5f, 0f);
+                        boxes.transform.localPosition = new Vector3(x * 0.5f, y * 0.5f, z) + offset;
+                        boxes.transform.rotation = Quaternion.Euler(0, 0, 270);
+                        break;
+                    case RoomDirect.Down:
+                        offset = new Vector3(-0.35f, 0.5f, 0f);
+                        boxes.transform.localPosition = new Vector3(x * 0.5f, y * -0.5f, z) + offset;
+                        boxes.transform.rotation = Quaternion.Euler(0, 0, 180);
+                        break;
+                    case RoomDirect.Left:
+                        offset = new Vector3(0.5f, 0.5f, 0f);
+                        boxes.transform.localPosition = new Vector3(x * -0.5f, y * -0.5f, z) + offset;
+                        boxes.transform.rotation = Quaternion.Euler(0, 0, 90);
+                        break;
+                }
+            }
+            
+        }
+    }
+
+    // -------------------------------------------------------------
+    // 타일 그리기
+    // -------------------------------------------------------------
     private void DrawTile(Tilemap tileMap, TileType type, TileDirect direct, Vector3Int pos)
     {
         Tile tile = null;
