@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MonsterSpawner : MonoBehaviour
@@ -35,11 +35,10 @@ public class MonsterSpawner : MonoBehaviour
     public void Set(List<Vector3> spawnPositions)
     {
         spawnPoints = spawnPositions;
-        this.CreateEnemy();     // !!! temp
     }
 
     public void Spawn()
     {
-
+        this.CreateEnemy();
     }
 }
