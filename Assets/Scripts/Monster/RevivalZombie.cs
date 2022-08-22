@@ -1,35 +1,26 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class RevivalZombie : Monster
 {
     protected float timeBetRevive = 5f; // 부활 대기시간
     float startReviveTime; // 부활 시작시간
 
-    // 몬스터 초기화
-    protected override void Setup()
+    // 사망 상태 수행 후 부활 처리
+    protected override IEnumerator Dying()
     {
-        maxHealth = 150f;
-        corpseHealth = 75f;
-        damage = 20f;
-        speed = 1f;
+        startReviveTime = Time.time;
 
-        base.Setup();
-    }
-
-    protected override void Update()
-    {
-        // 현재 행동 수행
-        if (action == "moving")
+        while (dead)
         {
-            Moving();
-        }
-        else if (action == "reviving")
-        {
-            Reviving();
-        }
+            rigidbody2d.velocity = Vector2.zero;
+            if (Time.time >= startReviveTime + timeBetRevive)
+            {
+                Revive();
+            }
 
-        // 추적 대상의 존재 여부에 따라 다른 애니메이션을 재생
-        animator.SetBool("HasTarget", hasTarget);
+            yield return new WaitForSeconds(0.05f);
+        }
     }
 
     // 부활 수행
@@ -41,13 +32,4 @@ public class RevivalZombie : Monster
             Revive();
         }
     }
-
-    // 사망 처리 후 부활 대기
-    public override void Die()
-    {
-        base.Die();
-        startReviveTime = Time.time;
-        action = "reviving";
-    }
-
 }

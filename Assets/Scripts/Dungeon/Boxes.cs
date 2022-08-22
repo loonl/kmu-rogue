@@ -33,13 +33,9 @@ public class Boxes : MonoBehaviour
 
     private GameObject CreateObject(RoomDirect direct)
     {
-        Object obj = Random.value < 0.5
-            ? Resources.Load("Prefabs/Dungeon/barrel")
-            : Resources.Load("Prefabs/Dungeon/box");
-        // Object obj = Resources.Load("Prefabs/Dungeon/box");
-
-        GameObject box = Instantiate(obj) as GameObject;
-        box.transform.SetParent(this.transform);
+        GameObject box = Random.value < 0.5
+            ? GameManager.Instance.CreateGO("Prefabs/Dungeon/barrel", this.transform)
+            : GameManager.Instance.CreateGO("Prefabs/Dungeon/box", this.transform);
 
         switch (direct)
         {
