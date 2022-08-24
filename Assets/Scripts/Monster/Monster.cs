@@ -28,15 +28,9 @@ public class Monster: MonoBehaviour
 
     public bool dead = false; // 사망 상태
     protected string action; // 현재 수행 중인 상태
-<<<<<<< Updated upstream
-    protected Entity targetEntity; // 추적 대상
-=======
     protected Player player; // 추적 대상
->>>>>>> Stashed changes
     protected Vector2 direction; // 경로 방향
 
-    public event Action onDeath; // 사망 시 발동 이벤트
-    public event Action onRevive; // 부활 시 발동 이벤트
     public event Action onEliminate; // 시체제거 시 발동 이벤트
     // 추적 대상의 존재 여부
     protected bool hasTarget
@@ -63,6 +57,7 @@ public class Monster: MonoBehaviour
     }
     protected void Start()
     {
+        
         SetUp(); // 몬스터 초기화
         Generate(); // 몬스터 생성
     }
@@ -90,7 +85,7 @@ public class Monster: MonoBehaviour
     // 경로 갱신
     protected IEnumerator UpdatePath()
     {
-        while(!dead)
+        while (!dead)
         {
             if (hasTarget)
             {
@@ -109,15 +104,11 @@ public class Monster: MonoBehaviour
             }
             else 
             {
-<<<<<<< Updated upstream
-                targetEntity = GameObject.FindGameObjectWithTag("Player").GetComponent<Entity>();
-=======
                 player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
                 if (hasTarget)
                 {
                     StartCoroutine(Moving());
                 }
->>>>>>> Stashed changes
                 animator.SetBool("HasTarget", hasTarget);
             }
 
@@ -171,11 +162,6 @@ public class Monster: MonoBehaviour
     // 사망 시 실행
     public virtual void Die()
     {
-        if (onDeath != null)
-        {
-            onDeath();
-        }
-
         dead = true;
         health = corpseHealth;
         StartCoroutine(Dying());
@@ -202,11 +188,6 @@ public class Monster: MonoBehaviour
     // 부활 시 실행
     protected void Revive()
     {
-        if (onRevive != null)
-        {
-            onRevive();
-        }
-
         maxHealth = (float)Math.Ceiling(maxHealth * 2 / 3);
         Generate();
 

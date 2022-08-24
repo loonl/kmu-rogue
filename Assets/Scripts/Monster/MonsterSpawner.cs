@@ -20,21 +20,9 @@ public class MonsterSpawner : MonoBehaviour
         this.monsterProbList = monsterProbList;
     }
 
-<<<<<<< Updated upstream
-    private int _roomIndex;
-    //private void OnEnable()
-    //{
-    //    // 몬스터 스폰
-    //    CreateEnemy();
-    //}
-
-    // 몬스터를 생성하고 추적할 대상 할당
-    private void CreateEnemy()
-=======
 
     // 몬스터 스폰
     public void Spawn()
->>>>>>> Stashed changes
     {
         foreach (Vector3 spawnPoint in spawnPoints)
         {
@@ -46,15 +34,6 @@ public class MonsterSpawner : MonoBehaviour
             Monster monster = enemy.GetComponent<Monster>();
             monster.monsterData = monsterData;
             monsters.Add(monster);
-<<<<<<< Updated upstream
-            monster.onDeath += () =>
-            {
-                monsters.Remove(monster);
-                CheckRemainEnemy();
-            };
-            monster.onEliminate += () => Destroy(monster.gameObject);
-            monster.onRevive += () => monsters.Add(monster);
-=======
 
             monster.onEliminate += () =>
             {
@@ -62,7 +41,6 @@ public class MonsterSpawner : MonoBehaviour
                 monsters.Remove(monster);
                 CheckRemainEnemy();
             };
->>>>>>> Stashed changes
         }
     }
 
