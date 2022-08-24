@@ -56,7 +56,7 @@ public class DungeonRoom : MonoBehaviour
         OpenDoorLayer.gameObject.SetActive(true);
     }
 
-    public void SetSpawner(MonsterSpawner spawner, int roomIndex)
+    public void SetSpawner(MonsterSpawner spawner, int roomIndex, int Floor, List<Dictionary<string, object>> monsterData, List<float> monsterProbList)
     {
         _spawner = spawner;
         List<Vector3> spots = new List<Vector3>();
@@ -75,7 +75,7 @@ public class DungeonRoom : MonoBehaviour
             spots.Add(this.transform.position + diff);
         }
 
-        _spawner.Set(spots, roomIndex);
+        _spawner.Set(spots, roomIndex, Floor, monsterData, monsterProbList);
         //_spawner.CreateEnemy
     }
 }
