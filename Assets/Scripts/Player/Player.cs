@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour
+{
     // player stat variables
     public Stat stat = new Stat(false);
     public bool isAttacking;
@@ -24,7 +25,7 @@ public class Player : MonoBehaviour {
         spumMgr = transform.GetChild(0).GetChild(0).GetComponent<SPUM_SpriteList>();
         rig = GetComponent<Rigidbody2D>();
 
-        // player's first equipments (ÇÃ·¹ÀÌ¾î Ã¹ Àåºñ)
+        // player's first equipments (ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ Ã¹ ï¿½ï¿½ï¿½)
         equipment = new List<Item> { ItemManager.Instance.GetItem(0), // sword
                                      ItemManager.Instance.GetItem(35), // helmet
                                      ItemManager.Instance.GetItem(57), // armor
@@ -54,7 +55,7 @@ public class Player : MonoBehaviour {
             wpnColl.poly.enabled = false;
 
             // clear attack collider monster list
-            if (wpnColl.monsters.Count > 0) 
+            if (wpnColl.monsters.Count > 0)
             {
                 wpnColl.monsters.Clear();
             }
@@ -143,7 +144,7 @@ public class Player : MonoBehaviour {
             isAttacking = true;
 
             // TO-DO
-            // ½ºÅ³ °ü·Ã ±¸Çö
+            // ï¿½ï¿½Å³ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         }
 
         // test code - change equipments

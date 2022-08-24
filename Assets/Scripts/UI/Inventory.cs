@@ -7,13 +7,9 @@ using TMPro;
 public class Inventory : MonoBehaviour
 {
     private int gold = 0;
+    [SerializeField]
     TextMeshProUGUI coinTXT;
     public int Gold { get { return gold; } }
-    private void Start()
-    {
-        coinTXT = GameObject.Find("GoldCnt").GetComponent<TextMeshProUGUI>();
-    }
-
     // -------------------------------------------------------------
     // 골드
     // -------------------------------------------------------------
