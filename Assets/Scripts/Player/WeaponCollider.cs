@@ -32,5 +32,10 @@ public class WeaponCollider : MonoBehaviour
             // execute ondamage function when monster is in range
             collision.gameObject.SendMessage("OnDamage", playerUnit.stat.damage);
         }
+
+        if (collision.gameObject.tag == "MapObject")
+        {
+            collision.gameObject.SendMessage("OnDamage");
+        }
     }
 }

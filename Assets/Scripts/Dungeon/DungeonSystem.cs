@@ -14,6 +14,9 @@ public class DungeonSystem : MonoBehaviour
     [SerializeField]
     private int tempRoomCount;
 
+    public Transform DroppedItems;        // 떨어진 아이템 parent transform
+
+
     public List<DungeonRoom> Rooms { get { return generator.Rooms; } }
 
     private void Awake()

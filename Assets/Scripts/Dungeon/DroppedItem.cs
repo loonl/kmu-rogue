@@ -2,40 +2,50 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DroppedItem : MonoBehaviour
+public class DroppedItem : Interact
 {
-    private CircleCollider2D _collider;
-    // private sprite _sprite;
-    private int _price = 0;
+    [SerializeField]
+    private SpriteRenderer _renderer;
 
-    private void Start()
-    {
-        _collider = this.GetComponent<CircleCollider2D>();
-    }
+    private Item _item;
+    public Item Item { get { return _item; } }
 
-    public void Set(int itemId, int price = 0)
+    public int _price = 0;
+    // private Image _sprite;
+
+    public void Set(Item item, int price = 0)
     {
         // 이미지 할당
+        // Item 내에 sprite 이미지를 갖고 있으면 좋을듯
+        //this._renderer.sprite = item.Image;
 
-        // price가 있는 경우 상호작용 이벤트가 구매로 바뀜
-            // 구매는 price를 0으로 수정하면 될듯
-            // 한번 누르면 구매, 다시 구매하면 교체
-        // price가 없는 경우 줍기 혹은 교체
+        this._price = price;
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    public override void InteractEvent()
     {
-        if (other.tag == "Player") 
+        if (this._price == 0)
         {
-            // player.AddInteractEvent()
+            // Get
+            //GameManager.Instance.Player.Equip(this._item)
+            // 만약 기존 장착한 아이템이 있으면
+            // this.Set(unEquippedItem);
+            // 없으면
+            //Destroy(this.gameObject);
         }
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.tag == "Player") 
+        else
         {
-            // player.RemoveInteractEvent()
+            // Buy
+            if (GameManager.Instance.Player.Inventory.Gold < this._price)
+            {
+                return;
+            }
+
+            // price를 0으로 바꾸어 Get으로 바뀌게 만듬
+            GameManager.Instance.Player.Inventory.UpdateGold(-1 * this._price);
+            this._price = 0;
+
+            // !!! Sound (구매음 추가하기)
         }
     }
 }

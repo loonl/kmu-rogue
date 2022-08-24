@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager _instance = null;
     public static GameManager Instance { get { return _instance; } }
-    public Player player; // TO-DO <- Player를 인스턴스화?
+    public Player Player { get; private set; }
 
     private void Awake()
     {
@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
         {
             _instance = this;
             DontDestroyOnLoad(this.gameObject);
+            this.Player = GameObject.Find("Player").GetComponent<Player>();
         }
         else
         {
@@ -32,7 +33,7 @@ public class GameManager : MonoBehaviour
     // -------------------------------------------------------------
     public void Equip(Item item)
     {
-        var spum = player.spumMgr;
+        var spum = Player.spumMgr;
 
         // 바뀌는 장비가 어느 부위인지 판단
         int partsIndex;
@@ -43,30 +44,30 @@ public class GameManager : MonoBehaviour
             partsIndex = item.itemType - 3;
 
         // 입고 있는 것 먼저 un-equip
-        UnEquip(player.equipment[partsIndex]);
+        UnEquip(Player.equipment[partsIndex]);
 
         // 플레이어 스탯 수정
         List<Stat> itemStat = new List<Stat> { item.stat };
-        player.stat.SyncStat(itemStat);
+        Player.stat.SyncStat(itemStat);
 
 
         // TO-DO 상의 필요 (근접 무기 -> 활 / 스태프로 무기 변경 시 방패 자동 장착 해제)
         if (partsIndex == 0)
         {
-            if (player.equipment[0].itemType == 1 && (item.itemType == 2 || item.itemType == 3))
+            if (Player.equipment[0].itemType == 1 && (item.itemType == 2 || item.itemType == 3))
             {
-                UnEquip(player.equipment[4]);
-                player.equipment[4] = ItemManager.Instance.GetItem(94);
+                UnEquip(Player.equipment[4]);
+                Player.equipment[4] = ItemManager.Instance.GetItem(94);
             }
         }
 
         // 활 / 스태프 상태에서 방패 장착 시 활 / 스태프 자동 장착 해제
         else if (partsIndex == 4)
         {
-            if (player.equipment[0].itemType == 2 || player.equipment[0].itemType == 3)
+            if (Player.equipment[0].itemType == 2 || Player.equipment[0].itemType == 3)
             {
-                UnEquip(player.equipment[0]);
-                player.equipment[0] = ItemManager.Instance.GetItem(1);
+                UnEquip(Player.equipment[0]);
+                Player.equipment[0] = ItemManager.Instance.GetItem(1);
             }
         }
 
@@ -102,33 +103,33 @@ public class GameManager : MonoBehaviour
         }
 
         // 장착 슬롯에 아이템 추가
-        player.equipment[partsIndex] = item;
+        Player.equipment[partsIndex] = item;
     }
 
     public void UnEquip(Item item)
     {
-        var spum = player.spumMgr;
+        var spum = Player.spumMgr;
         int type = item.itemType;
 
         // 플레이어 스탯 수정
         List<Stat> itemStat = new List<Stat> { item.stat };
-        player.stat.SubStat(itemStat);
+        Player.stat.SubStat(itemStat);
 
         // Shield나 무기라면 플레이어 외형 수정
         if (type == 7)
         {
             spum._weaponListString[3] = "";
-            spum.SyncPath(player.spumMgr._weaponList, player.spumMgr._weaponListString);
+            spum.SyncPath(Player.spumMgr._weaponList, Player.spumMgr._weaponListString);
         }
         else if (type == 1)
         {
             spum._weaponListString[0] = "";
-            spum.SyncPath(player.spumMgr._weaponList, player.spumMgr._weaponListString);
+            spum.SyncPath(Player.spumMgr._weaponList, Player.spumMgr._weaponListString);
         }
         else if (type == 2 || type == 3)
         {
             spum._weaponListString[2] = "";
-            spum.SyncPath(player.spumMgr._weaponList, player.spumMgr._weaponListString);
+            spum.SyncPath(Player.spumMgr._weaponList, Player.spumMgr._weaponListString);
         }
     }
 
