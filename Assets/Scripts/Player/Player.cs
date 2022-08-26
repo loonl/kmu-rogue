@@ -59,7 +59,13 @@ public class Player : MonoBehaviour {
         anim.GetComponent<PlayerAnimreciver>().onDieComplete = () =>
         {
             // hide character
-            gameObject.SetActive(false);
+            //gameObject.SetActive(false);
+
+            // temporary code
+            // disable physics
+            GetComponent<CapsuleCollider2D>().enabled = false;
+            rig.velocity = new Vector2(0, 0);
+            rig.isKinematic = true;
         };
 
         // used in animator end event - attack
