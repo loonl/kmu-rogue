@@ -8,7 +8,7 @@ public class MonsterSpawner : MonoBehaviour
 
     private List<Dictionary<string, object>> monsterData; // 몬스터 데이터
     private List<float> monsterProbList = new List<float>(); // 몬스터 생성 확률을 담은 리스트
-    private List<Monster> monsters = new List<Monster>(); // 생성된 몬스터들을 담는 리스트
+    public List<Monster> monsters = new List<Monster>(); // 생성된 몬스터들을 담는 리스트
     private List<Vector3> spawnPoints; // 스폰 위치
 
     public void Set(List<Vector3> spawnPositions, int roomIndex, int floor, List<Dictionary<string, object>> monsterData, List<float> monsterProbList)

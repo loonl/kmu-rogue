@@ -80,6 +80,7 @@ public class Monster: MonoBehaviour
         dead = false;
         action = "moving";
         StartCoroutine(UpdatePath());
+        StartCoroutine(Moving());
     }
 
     // 경로 갱신
@@ -99,19 +100,13 @@ public class Monster: MonoBehaviour
                 {
                     transform.localScale = new Vector3(scale, scale, 1);
                 }
-
-                animator.SetBool("HasTarget", hasTarget);
             }
             else 
             {
                 player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
-                if (hasTarget)
-                {
-                    StartCoroutine(Moving());
-                }
-                animator.SetBool("HasTarget", hasTarget);
             }
 
+            animator.SetBool("HasTarget", hasTarget);
             yield return new WaitForSeconds(0.1f);
         }
     }
@@ -156,7 +151,7 @@ public class Monster: MonoBehaviour
 
         //audioPlayer.PlayOneShot(hitSound);
 
-        Debug.Log("Zombie Health: " + health);
+        Debug.Log("Monster Health: " + health);
     }
 
     // 사망 시 실행
@@ -186,7 +181,7 @@ public class Monster: MonoBehaviour
     }
 
     // 부활 시 실행
-    protected void Revive()
+    public void Revive()
     {
         maxHealth = (float)Math.Ceiling(maxHealth * 2 / 3);
         Generate();

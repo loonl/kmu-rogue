@@ -1,5 +1,5 @@
 ID,Path,Name,Scale,Gold,MaxHealth,Damage,Speed,Floor1,Floor2,Floor3,Floor4,Floor5,Floor6,Floor7,Floor8,Floor9,Floor10,Floor11,Floor12
-0,Prefabs/Monster/Zombie1,Zombie1,0.7,1,100,20,0.7,60,30,0,0,0,0,0,0,0,0,0,0
+0,Prefabs/Monster/Zombie1,Zombie1,0.7,1,10,20,0.7,60,30,0,0,0,0,0,0,0,0,0,0
 1,Prefabs/Monster/Zombie2,Zombie2,0.7,2,100,20,0.7,0,30,30,0,0,0,0,0,0,0,0,0
 2,Prefabs/Monster/Zombie3,Zombie3,0.7,3,100,20,0.7,0,0,30,0,0,0,0,0,0,0,0,0
 3,Prefabs/Monster/FastZombie1,FastZombie1,0.7,5,100,20,0.7,20,0,0,0,0,0,0,0,0,0,0,0
@@ -12,3 +12,4 @@ ID,Path,Name,Scale,Gold,MaxHealth,Damage,Speed,Floor1,Floor2,Floor3,Floor4,Floor
 10,Prefabs/Monster/RushZombie2,RushZombie2,0.7,12,100,20,0.7,0,10,0,0,0,0,0,0,0,0,0,0
 11,Prefabs/Monster/RushZombie3,RushZombie3,0.7,14,100,20,0.7,0,0,10,0,0,0,0,0,0,0,0,0
 12,Prefabs/Monster/Boss1,Boss1,1,100,1000,20,0.5,0,0,0,0,0,0,0,0,0,0,0,0
+13,Prefabs/Monster/Boss2,Boss2,1,100,1000,20,0.5,0,0,0,0,0,0,0,0,0,0,0,0
