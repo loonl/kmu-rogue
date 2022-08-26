@@ -5,16 +5,22 @@ using UnityEngine;
 public class Player : MonoBehaviour {
     // player stat variables
     public Stat stat = new Stat(false);
+    [HideInInspector]
     public bool isAttacking;
+    [HideInInspector]
     public float remainCool;
+    [HideInInspector]
     public bool dead;
 
     // equipments => 0 : Weapon, 1 : Helmet, 2 : Armor, 3 : Pants, 4 : Shield
+    [HideInInspector]
     public List<Item> equipment;
 
     Animator anim;
     WeaponCollider wpnColl;
     Rigidbody2D rig;
+    PlayerAttack playerAttack;
+    [HideInInspector]
     public SPUM_SpriteList spumMgr;
 
     // 인벤토리
@@ -30,23 +36,24 @@ public class Player : MonoBehaviour {
 
     void Start()
     {
+        playerAttack = GetComponent<PlayerAttack>();
         anim = transform.GetChild(0).gameObject.GetComponent<Animator>();
         wpnColl = transform.GetChild(0).gameObject.GetComponent<WeaponCollider>();
         spumMgr = transform.GetChild(0).GetChild(0).GetComponent<SPUM_SpriteList>();
         rig = GetComponent<Rigidbody2D>();
 
         // player's first equipments (플레이어 첫 장비)
-        equipment = new List<Item> { ItemManager.Instance.GetItem(0), // sword
+        equipment = new List<Item> { ItemManager.Instance.GetItem(0), // weapon
                                      ItemManager.Instance.GetItem(35), // helmet
                                      ItemManager.Instance.GetItem(57), // armor
                                      ItemManager.Instance.GetItem(78), // pants
                                      ItemManager.Instance.GetItem(94)  // shield
                                     };
 
+        List<Stat> temp = new List<Stat>();
         for (int i = 0; i < equipment.Count; i++)
-        {
-            GameManager.Instance.Equip(equipment[i]);
-        }
+            temp.Add(equipment[i].stat);
+        stat.SyncStat(temp);
 
         // used in animator end event - death
         anim.GetComponent<PlayerAnimreciver>().onDieComplete = () =>
@@ -131,6 +138,8 @@ public class Player : MonoBehaviour {
             anim.SetTrigger("Attack");
             isAttacking = true;
 
+            playerAttack.Attack(equipment[0].id);
+
             // enable weapon collider
             wpnColl.poly.enabled = true;
         }
@@ -153,31 +162,31 @@ public class Player : MonoBehaviour {
             // do not let attack and use skill at the same time
             isAttacking = true;
 
-            // TO-DO
             // 스킬 관련 구현
+            playerAttack.SkillAttack(equipment[0].id);
         }
 
         // test code - change equipments
         if (Input.GetKeyDown(KeyCode.G)) // helmet
-            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(35, 56)));
+            Equip(ItemManager.Instance.GetItem(Random.Range(35, 56)));
 
         if (Input.GetKeyDown(KeyCode.H)) // armor
-            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(57, 77)));
+            Equip(ItemManager.Instance.GetItem(Random.Range(57, 76)));
 
         if (Input.GetKeyDown(KeyCode.J)) // pants
-            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(78, 93)));
+            Equip(ItemManager.Instance.GetItem(Random.Range(78, 93)));
 
         if (Input.GetKeyDown(KeyCode.K)) // shield
-            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(94, 103)));
+            Equip(ItemManager.Instance.GetItem(Random.Range(94, 103)));
 
         if (Input.GetKeyDown(KeyCode.B)) // sword
-            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(1, 14)));
+            Equip(ItemManager.Instance.GetItem(Random.Range(1, 14)));
 
         if (Input.GetKeyDown(KeyCode.N)) // bow
-            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(28, 31)));
+            Equip(ItemManager.Instance.GetItem(Random.Range(28, 31)));
 
         if (Input.GetKeyDown(KeyCode.M)) // staff
-            GameManager.Instance.Equip(ItemManager.Instance.GetItem(Random.Range(32, 34)));
+            Equip(ItemManager.Instance.GetItem(Random.Range(32, 34)));
 
         if (Input.GetKeyDown(KeyCode.P))
         {
@@ -198,72 +207,110 @@ public class Player : MonoBehaviour {
         }
     }
 
-    // change player's equipment parts
-    //private void ChangePlayerParts(int ver, int index)
-    //{
-    //    switch (ver)
-    //    {
-    //        case 0: // helmet
-    //            // change info & re-sync data
-    //            spumMgr._hairListString[1] = parts.helmetsList[index].info;
-    //            curHelmet = parts.helmetsList[index];
-    //            UpdateHP();
-    //            spumMgr.SyncPath(spumMgr._hairList, spumMgr._hairListString);
-    //            break;
+    // -------------------------------------------------------------
+    // Player 아이템 착용 / 해제
+    // -------------------------------------------------------------
+    public void Equip(Item item)
+    {
 
-    //        case 1: // armors
-    //            // change info & re-sync data
-    //            spumMgr._armorListString[0] = spumMgr._armorListString[1] =
-    //                spumMgr._armorListString[2] = parts.armorsList[index].info;
-    //            curArmor = parts.armorsList[index];
-    //            UpdateHP();
-    //            spumMgr.SyncPath(spumMgr._armorList, spumMgr._armorListString);
-    //            break;
+        // 바뀌는 장비가 어느 부위인지 판단
+        int partsIndex;
+        int type = item.itemType;
+        if (type == 0 || type == 1 || type == 2)
+            partsIndex = 0;
+        else
+            partsIndex = item.itemType - 3;
 
-    //        case 2: // pants
-    //            // change info & re-sync data
-    //            spumMgr._pantListString[0] = spumMgr._pantListString[1] =
-    //                parts.pantsList[index].info;
-    //            curPants = parts.pantsList[index];
-    //            UpdateHP();
-    //            spumMgr.SyncPath(spumMgr._pantList, spumMgr._pantListString);
-    //            break;
+        // 입고 있는 것 먼저 un-equip
+        if (!item.isEmpty())
+            UnEquip(equipment[partsIndex]);
 
-    //        case 3: // shield
-    //            // change info & re-sync data
-    //            spumMgr._weaponListString[3] = parts.shieldsList[index].info;
-    //            curShield = parts.shieldsList[index];
+        // 플레이어 스탯 수정
+        List<Stat> itemStat = new List<Stat> { item.stat };
+        stat.SyncStat(itemStat);
 
-    //            // if player is equipping left-handed weapons, then un-equip
-    //            if (spumMgr._weaponListString[2] != "")
-    //            {
-    //                curWeapon = parts.weaponsList[0];
-    //                spumMgr._weaponListString[2] = "";
-    //            }
 
-    //            UpdateHP();
-    //            spumMgr.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
-    //            break;
+        // TO-DO 상의 필요 (근접 무기 -> 활 / 스태프로 무기 변경 시 방패 자동 장착 해제)
+        if (partsIndex == 0)
+        {
+            if (equipment[0].itemType == 1 && (item.itemType == 2 || item.itemType == 3))
+            {
+                UnEquip(equipment[4]);
+                equipment[4] = ItemManager.Instance.GetItem(94);
+            }
+        }
 
-    //        case 4: // weapon
-    //            // weapon depends on weapon_type 
-    //            WeaponInfo nextWeapon = parts.weaponsList[index];
-    //            if (nextWeapon.weapontype == WeaponType.Melee)
-    //                spumMgr._weaponListString[0] = nextWeapon.info;
-    //            else // if weapon type == bow or staff
-    //            {
-    //                spumMgr._weaponListString[0] = ""; // un-equip right hand weapon
-    //                spumMgr._weaponListString[3] = ""; // cannot equip shields
-    //                curShield = parts.shieldsList[0];
-    //                spumMgr._weaponListString[2] = nextWeapon.info;
-    //            }
+        // 활 / 스태프 상태에서 방패 장착 시 활 / 스태프 자동 장착 해제
+        else if (partsIndex == 4)
+        {
+            if (equipment[0].itemType == 2 || equipment[0].itemType == 3)
+            {
+                UnEquip(equipment[0]);
+                equipment[0] = ItemManager.Instance.GetItem(1);
+            }
+        }
 
-    //            curWeapon = parts.weaponsList[index];
-    //            UpdateStats();
-    //            spumMgr.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
-    //            break;
-    //    }
-    //}
+        // 플레이어 외형 수정
+        switch (type)
+        {
+            case 1: // sword
+                spumMgr._weaponListString[0] = item.path;
+                spumMgr.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
+                break;
+            case 2: // bow
+            case 3: // staff
+                spumMgr._weaponListString[2] = item.path;
+                spumMgr.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
+                break;
+            case 4: // helmet
+                spumMgr._hairListString[1] = item.path;
+                spumMgr.SyncPath(spumMgr._hairList, spumMgr._hairListString);
+                break;
+            case 5: // armor
+                spumMgr._armorListString[0] = spumMgr._armorListString[1] =
+                    spumMgr._armorListString[2] = item.path;
+                spumMgr.SyncPath(spumMgr._armorList, spumMgr._armorListString);
+                break;
+            case 6: // pants
+                spumMgr._pantListString[0] = spumMgr._pantListString[1] = item.path;
+                spumMgr.SyncPath(spumMgr._pantList, spumMgr._pantListString);
+                break;
+            case 7: // shield
+                spumMgr._weaponListString[3] = item.path;
+                spumMgr.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
+                break;
+        }
+
+        // 장착 슬롯에 아이템 추가
+        equipment[partsIndex] = item;
+    }
+
+    public void UnEquip(Item item)
+    {
+        var spum = spumMgr;
+        int type = item.itemType;
+
+        // 플레이어 스탯 수정
+        List<Stat> itemStat = new List<Stat> { item.stat };
+        stat.SubStat(itemStat);
+
+        // Shield나 무기라면 플레이어 외형 수정
+        if (type == 7)
+        {
+            spum._weaponListString[3] = "";
+            spum.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
+        }
+        else if (type == 1)
+        {
+            spum._weaponListString[0] = "";
+            spum.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
+        }
+        else if (type == 2 || type == 3)
+        {
+            spum._weaponListString[2] = "";
+            spum.SyncPath(spumMgr._weaponList, spumMgr._weaponListString);
+        }
+    }
 
     public void OnDamage(float damage)
     {
@@ -284,6 +331,9 @@ public class Player : MonoBehaviour {
     {
         // change animation to death
         anim.SetTrigger("Die");
+
+        // TO-DO DEAD 로 TRUE 만들기
+        dead = true;
     }
 
     // -------------------------------------------------------------

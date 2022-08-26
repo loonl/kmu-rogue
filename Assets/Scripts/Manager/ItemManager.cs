@@ -26,6 +26,6 @@ public class ItemManager : MonoBehaviour
             data = CSVReader.Read("Datas/Item");
         }
 
-        return new Item(data[itemId]);
+        return new Item(itemId, data[itemId]);
     }
 }
