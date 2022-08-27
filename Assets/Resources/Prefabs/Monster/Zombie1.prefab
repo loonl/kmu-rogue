@@ -2533,7 +2533,7 @@ RectTransform:
   m_GameObject: {fileID: 5148159909380461712}
   m_LocalRotation: {x: 0, y: 0.008726558, z: 0, w: 0.999962}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5455356662978897197}
@@ -2601,8 +2601,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.2}
-  m_Size: {x: 0.3, y: 0.4}
+  m_Offset: {x: 0, y: 0.3}
+  m_Size: {x: 0.4, y: 0.6}
   m_Direction: 0
 --- !u!114 &4286653788150504434
 MonoBehaviour:
@@ -2616,13 +2616,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2317871862856e4783710d895b1bbaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dead: 0
   deathSound: {fileID: 0}
   hitSound: {fileID: 0}
-  corpseHealth: 75
-  damage: 20
-  speed: 1
-  attackCoolTime: 1
+  idNumber: 0
+  dead: 0
 --- !u!1 &5245307644295478559
 GameObject:
   m_ObjectHideFlags: 0

@@ -14,6 +14,9 @@ public class DungeonSystem : MonoBehaviour
     [SerializeField]
     private int tempRoomCount;
 
+    public Transform DroppedItems;        // 떨어진 아이템 parent transform
+
+
     public List<DungeonRoom> Rooms { get { return generator.Rooms; } }
 
     private void Awake()
@@ -49,7 +52,7 @@ public class DungeonSystem : MonoBehaviour
 
         // 맵 생성
         generator.Generate(tempRoomCount, tileSeqence[(Floor - 1) % 4]);
-        CreateSpawners();   // 스포너 생성
+        CreateSpawners(Floor);   // 스포너 생성
         CreateShop();       // 상점 생성
     }
 
@@ -62,16 +65,57 @@ public class DungeonSystem : MonoBehaviour
     // -------------------------------------------------------------
     // 스포너 생성
     // -------------------------------------------------------------
-    private void CreateSpawners()
+    private void CreateSpawners(int floor)
     {
-        for (int i = 1; i < generator.Rooms.Count; i++)
+        List<Dictionary<string, object>> monsterSpawnerData = CSVReader.Read("Datas/MonsterSpawner");
+        List<Dictionary<string, object>> monsterData = CSVReader.Read("Datas/Monster");
+
+        List<float> monsterProbList = new List<float>();
+        for (int i = 0; i < monsterSpawnerData.Count; i++)
+        {
+            if(floor == int.Parse(monsterSpawnerData[i]["Floor"].ToString()))
+            {
+                monsterProbList.Add(float.Parse(monsterSpawnerData[i]["Prob"].ToString()));
+            }
+        }
+
+        for (int roomIndex = 1; roomIndex < generator.Rooms.Count; roomIndex++)
         // foreach (DungeonRoom room in generator.Rooms)
         {
             // 0번 방에는 스포너를 안만듬
-            GameObject goSpawner = GameManager.Instance.CreateGO("Prefabs/Dungeon/Spawner", generator.Rooms[i].transform);
+            int MonsterSpawnerId = RandomSelect(monsterProbList);
+            string MonsterSpawnerPath = monsterSpawnerData[MonsterSpawnerId]["Path"].ToString();
+
+            GameObject goSpawner = GameManager.Instance.CreateGO(MonsterSpawnerPath, generator.Rooms[roomIndex].transform);
             MonsterSpawner spawner = goSpawner.GetComponent<MonsterSpawner>();
-            generator.Rooms[i].SetSpawner(spawner, i);
+            generator.Rooms[roomIndex].SetSpawner(spawner, roomIndex, monsterData);
         }
+    }
+
+    // csv파일에 기재된 확률에 의거해 무작위로 몬스터 선택
+    int RandomSelect(List<float> list)
+    {
+        float total = 0;
+
+        foreach (float elem in list)
+        {
+            total += elem;
+        }
+
+        float randomPoint = Random.value * total;
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (randomPoint < list[i])
+            {
+                return i;
+            }
+            else
+            {
+                randomPoint -= list[i];
+            }
+        }
+        return list.Count - 1;
     }
 
     // -------------------------------------------------------------

@@ -1,9 +1,8 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
-{
+public class Player : MonoBehaviour {
     // player stat variables
     public Stat stat = new Stat(false);
     public bool isAttacking;
@@ -18,6 +17,17 @@ public class Player : MonoBehaviour
     Rigidbody2D rig;
     public SPUM_SpriteList spumMgr;
 
+    // 인벤토리
+    public Inventory Inventory { get; private set; }
+
+    // 상호작용
+    public Interact _interact;
+
+    private void Awake()
+    {
+        this.Inventory = GameObject.Find("Inventory").GetComponent<Inventory>();    
+    }
+
     void Start()
     {
         anim = transform.GetChild(0).gameObject.GetComponent<Animator>();
@@ -25,7 +35,7 @@ public class Player : MonoBehaviour
         spumMgr = transform.GetChild(0).GetChild(0).GetComponent<SPUM_SpriteList>();
         rig = GetComponent<Rigidbody2D>();
 
-        // player's first equipments (�÷��̾� ù ���)
+        // player's first equipments (플레이어 첫 장비)
         equipment = new List<Item> { ItemManager.Instance.GetItem(0), // sword
                                      ItemManager.Instance.GetItem(35), // helmet
                                      ItemManager.Instance.GetItem(57), // armor
@@ -144,7 +154,7 @@ public class Player : MonoBehaviour
             isAttacking = true;
 
             // TO-DO
-            // ��ų ���� ����
+            // 스킬 관련 구현
         }
 
         // test code - change equipments
@@ -174,6 +184,17 @@ public class Player : MonoBehaviour
             print("MaxHP : " + stat.maxHp + "\nHP : " + stat.hp + "\nAttackPower : " + stat.damage
                + "\nAttackRange : " + stat.range + "\nSkillPower : " + stat.skillDamage
                + "\nSpeed : " + stat.speed + "\nCoolTime : " + stat.coolTime);
+        }
+
+        // 상호작용
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (this._interact == null)
+            {
+                return;
+            }
+
+            this._interact.InteractEvent();
         }
     }
 
@@ -263,5 +284,23 @@ public class Player : MonoBehaviour
     {
         // change animation to death
         anim.SetTrigger("Die");
+    }
+
+    // -------------------------------------------------------------
+    // 상호 작용
+    // -------------------------------------------------------------
+    public void AddInteractEvent(Interact interact)
+    {
+        if (this._interact != null)
+        {
+            return;
+        }
+
+        this._interact = interact;
+    }
+
+    public void RemoveInteractEvent()
+    {
+        this._interact = null;
     }
 }
