@@ -13,11 +13,17 @@ public class DroppedItem : Interact
     public int _price = 0;
     // private Image _sprite;
 
+    private void Start()
+    {
+        Set(ItemManager.Instance.GetItem(5));
+    }
+
     public void Set(Item item, int price = 0)
     {
+        this._item = item;
+
         // 이미지 할당
-        // Item 내에 sprite 이미지를 갖고 있으면 좋을듯
-        //this._renderer.sprite = item.Image;
+        this._renderer.sprite = item.image;
 
         this._price = price;
     }
@@ -26,12 +32,24 @@ public class DroppedItem : Interact
     {
         if (this._price == 0)
         {
+            int itemIndex;
+            int type = _item.itemType;
+            if (type == 0 || type == 1 || type == 2)
+                itemIndex = 0;
+            else
+                itemIndex = _item.itemType - 3;
+
+            Item temp = GameManager.Instance.Player.equipment[itemIndex];
+
             // Get
-            //GameManager.Instance.Player.Equip(this._item)
+            GameManager.Instance.Player.Equip(this._item);
+
             // 만약 기존 장착한 아이템이 있으면
-            // this.Set(unEquippedItem);
+            if (!temp.isEmpty())
+                Set(temp);
             // 없으면
-            //Destroy(this.gameObject);
+            else
+                Destroy(this.gameObject);
         }
         else
         {
