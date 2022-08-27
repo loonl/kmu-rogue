@@ -56,7 +56,7 @@ public class Monster: MonoBehaviour
         
     }
     protected void Start()
-    { 
+    {
         SetUp(); // 몬스터 초기화
         Generate(); // 몬스터 생성
     }
