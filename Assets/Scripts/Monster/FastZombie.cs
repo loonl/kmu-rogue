@@ -11,9 +11,9 @@ public class FastZombie : Monster
 
         // 목표가 가까워지면 이동속도 증가
         Player attackTarget = other.gameObject.GetComponent<Player>();
-        if (targetEntity == attackTarget)
+        if (player == attackTarget)
         {
-            speed += 0.5f;
+            speed += 0.75f;
         }
     }
 
@@ -26,9 +26,9 @@ public class FastZombie : Monster
 
         // 목표 멀어지면 이동속도 감소
         Player attackTarget = other.gameObject.GetComponent<Player>();
-        if (targetEntity == attackTarget)
+        if (player == attackTarget)
         {
-            speed -= 0.5f;
+            speed -= 0.75f;
         }
     }
 }

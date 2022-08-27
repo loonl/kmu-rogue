@@ -50,9 +50,9 @@ public class RushZombie : Monster
         // 목표가 가까워지면 돌진
         if (Time.time >= lastRushTime + rushCoolTime && rushing == false)
         {
+            Player attackTarget = other.gameObject.GetComponent<Player>();
             Debug.Log("a");
-            Player entity = other.gameObject.GetComponent<Player>();
-            if (targetEntity == entity)
+            if (player == attackTarget)
             {
                 lastRushTime = Time.time;
                 action = "rushing";
