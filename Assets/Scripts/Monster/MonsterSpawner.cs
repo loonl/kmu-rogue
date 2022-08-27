@@ -3,47 +3,55 @@ using UnityEngine;
 
 public class MonsterSpawner : MonoBehaviour
 {
-    public Monster monsterPrefab; // 생성할 몬스터 Prefab
+    private List<Dictionary<string, object>> monsterData; // 몬스터 데이터
+    public List<Monster> SetupMonsters = new List<Monster>(); // 생성할 몬스터들
+    public List<Monster> monsters = new List<Monster>(); // 남은 몬스터들
 
-    public List<Vector3> spawnPoints; // 스폰 위치
+    private int roomIndex; // 방 번호
+    private Vector3 roomPosition; // 방 위치
+    private float horizontalRange;
+    private float verticalRange;
 
-    private List<Monster> monsters = new List<Monster>(); // 생성된 몬스터들을 담는 리스트
-
-    private int _roomIndex;
-
-    // 몬스터 생성
-    private void CreateEnemy()
+    public void Set(int roomIndex, Vector3 roomPosition, float horizontalRange, float verticalRange, List<Dictionary<string, object>> monsterData)
     {
-        foreach (Vector3 spawnPoint in spawnPoints)
+        this.roomIndex = roomIndex;
+        this.roomPosition = roomPosition;
+        this.horizontalRange = horizontalRange;
+        this.verticalRange = verticalRange;
+        this.monsterData = monsterData;
+    }
+
+    // 몬스터 스폰
+    public void Spawn()
+    {
+        for (int i = 0; i < SetupMonsters.Count; i++)
         {
-            // !!! 좀비만 스폰되게 설정
-            GameObject enemy = GameManager.Instance.CreateGO("Prefabs/Dungeon/Zombie", this.transform);
-            enemy.transform.position = spawnPoint;
-            Monster monster = enemy.GetComponent<Zombie>() as Monster;
+            Monster monster = Instantiate(SetupMonsters[i]);
+            monster.monsterData = monsterData;
+            monster.transform.SetParent(gameObject.transform);
+            Vector3 diff = new Vector3(
+                Random.Range(-1 * horizontalRange, horizontalRange),
+                Random.Range(-1 * verticalRange, verticalRange),
+                0f
+            );
+            monster.transform.position = roomPosition + diff;
 
             monsters.Add(monster);
-            monster.onEliminate += () => Destroy(monster.gameObject);
-            monster.onEliminate += () => monsters.Remove(monster);
-            monster.onEliminate += () => CheckRemainEnemy();
+            monster.onEliminate += () =>
+            {
+                Destroy(monster.gameObject);
+                monsters.Remove(monster);
+                CheckRemainEnemy();
+            };
         }
     }
 
-    public void Set(List<Vector3> spawnPositions, int roomIndex)
-    {
-        spawnPoints = spawnPositions;
-        _roomIndex = roomIndex;
-    }
-
-    public void Spawn()
-    {
-        this.CreateEnemy();
-    }
-
+    // 방에 남은 몬스터가 있는지 확인
     private void CheckRemainEnemy()
     {
         if (monsters.Count < 1)
         {
-            DungeonSystem.Instance.Rooms[_roomIndex].Clear();
+            DungeonSystem.Instance.Rooms[roomIndex].Clear();
         }
     }
 }

@@ -13,7 +13,6 @@ public class Boss1 : RushZombie
         {
             if (Time.time < lastRushTime + timeForRushReady) // 대기
             {
-                Debug.Log(rushStep);
                 rushReady = true;
                 rigidbody2d.velocity = Vector2.zero;
             }

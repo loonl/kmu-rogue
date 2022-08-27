@@ -78,7 +78,7 @@ public class Player : MonoBehaviour {
             wpnColl.poly.enabled = false;
 
             // clear attack collider monster list
-            if (wpnColl.monsters.Count > 0) 
+            if (wpnColl.monsters.Count > 0)
             {
                 wpnColl.monsters.Clear();
             }

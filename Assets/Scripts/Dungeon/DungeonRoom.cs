@@ -56,26 +56,13 @@ public class DungeonRoom : MonoBehaviour
         OpenDoorLayer.gameObject.SetActive(true);
     }
 
-    public void SetSpawner(MonsterSpawner spawner, int roomIndex)
+    public void SetSpawner(MonsterSpawner spawner, int roomIndex, List<Dictionary<string, object>> monsterData)
     {
         _spawner = spawner;
-        List<Vector3> spots = new List<Vector3>();
         float horizontalRange = (float)(this.WallLayer.size.x - 2) * 0.5f;
         float verticalRange = (float)(this.WallLayer.size.y - 2) * 0.5f;
 
-        for (int i = 0; i < 5; i++)
-        {
-            // !!! 5마리만 스폰
-            Vector3 diff = new Vector3(
-                Random.Range(-1 * horizontalRange, horizontalRange),
-                Random.Range(-1 * verticalRange, verticalRange),
-                0f
-            );
-
-            spots.Add(this.transform.position + diff);
-        }
-
-        _spawner.Set(spots, roomIndex);
+        _spawner.Set(roomIndex, this.transform.position, horizontalRange, verticalRange, monsterData);
         //_spawner.CreateEnemy
     }
 }

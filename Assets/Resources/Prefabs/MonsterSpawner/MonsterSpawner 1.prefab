@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4962552526835318053}
   - component: {fileID: 4962552526835318052}
   m_Layer: 0
-  m_Name: Spawner
+  m_Name: MonsterSpawner 1
   m_TagString: Spawner
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,3 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6305e7a3a9e86bc48900ea914d5d343b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SetupMonsters:
+  - {fileID: 1235897264516950016, guid: 13d24ff3f3dd4eb4394e090ad2e8fbbe, type: 3}
+  - {fileID: 1235897264516950016, guid: 13d24ff3f3dd4eb4394e090ad2e8fbbe, type: 3}
+  - {fileID: 1235897264516950016, guid: 13d24ff3f3dd4eb4394e090ad2e8fbbe, type: 3}
+  - {fileID: 1235897264516950016, guid: 13d24ff3f3dd4eb4394e090ad2e8fbbe, type: 3}
+  - {fileID: 1235897264516950016, guid: 13d24ff3f3dd4eb4394e090ad2e8fbbe, type: 3}
+  monsters: []
