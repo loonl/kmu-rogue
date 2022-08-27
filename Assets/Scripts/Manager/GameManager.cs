@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get { return _instance; } }
     public Player Player { get; private set; }
 
+    public StageUIManager stageUIManager;
+
     private void Awake()
     {
         if (_instance == null)
@@ -24,6 +26,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        stageUIManager.init(Player.stat);
         DungeonSystem.Instance.CreateDungeon();
         DungeonSystem.Instance.Rooms[0].Clear();    // 첫번째 방은 클리어 된 상태
     }
@@ -141,7 +144,8 @@ public class GameManager : MonoBehaviour
         Object obj = Resources.Load(url);
         GameObject go = Instantiate(obj) as GameObject;
         go.transform.SetParent(parent);
-        
+
         return go;
     }
+
 }
