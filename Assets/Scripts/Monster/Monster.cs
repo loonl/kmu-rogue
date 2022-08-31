@@ -17,7 +17,7 @@ public class Monster: MonoBehaviour
 
     public int idNumber; // 아이디 넘버
     protected float scale; // 크기
-    protected float gold; //드랍 골드
+    protected int gold; //드랍 골드
     protected float maxHealth; // 최대 체력
     protected float health; // 현재 체력
     protected float corpseHealth; // 시체 체력
@@ -65,7 +65,7 @@ public class Monster: MonoBehaviour
     protected void SetUp()
     {
         scale = float.Parse(monsterData[idNumber]["Scale"].ToString());
-        gold = float.Parse(monsterData[idNumber]["Gold"].ToString());
+        gold = int.Parse(monsterData[idNumber]["Gold"].ToString());
         maxHealth = float.Parse(monsterData[idNumber]["MaxHealth"].ToString());
         damage = float.Parse(monsterData[idNumber]["Damage"].ToString());
         speed = float.Parse(monsterData[idNumber]["Speed"].ToString());
@@ -171,12 +171,13 @@ public class Monster: MonoBehaviour
         {
             onEliminate();
         }
+        DropGold();
     }
 
     // 소지금에 골드 추가
     public void DropGold()
     {
-        //targetEntity
+        GameManager.Instance.Player.Inventory.UpdateGold(gold);
     }
 
     // 부활 시 실행
