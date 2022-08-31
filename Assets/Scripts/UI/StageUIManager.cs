@@ -7,26 +7,23 @@ using TMPro;
 
 public class StageUIManager : MonoBehaviour
 {
-    [SerializeField]
-    GameObject playerUI;
-    [SerializeField]
-    Slider hpbar;
+    [SerializeField] private GameObject playerUI;
 
-    [SerializeField]
-    TextMeshProUGUI playerstat;
+    [SerializeField] private Slider hpbar;
 
-    Stat player;
-    Stat boss;
+    [SerializeField] private TextMeshProUGUI playerstat;
 
-    [SerializeField]
-    GameObject bossUI;
-    Slider bossHpbar;
+    private Player player;
+    private Stat boss;
 
-    [SerializeField]
-    GameObject backIMG;
-    [SerializeField]
-    GameObject statusFrame;
-    bool openStatus = false;
+    [SerializeField] private GameObject bossUI;
+
+    private Slider bossHpbar;
+    [SerializeField] private TextMeshProUGUI goldTxt;
+    [SerializeField] private GameObject backIMG;
+    [SerializeField] private GameObject statusFrame;
+
+    private bool openStatus = false;
     void Start()
     {
         bossHpbar = bossUI.GetComponent<Slider>();
@@ -37,40 +34,29 @@ public class StageUIManager : MonoBehaviour
         bossUI.SetActive(false);
     }
 
-    public void init(Stat player)
+    public void init(Player player)
     {
         this.player = player;
     }
 
-    [SerializeField]
-    Image playerRightImg;
-    [SerializeField]
-    SpriteRenderer rightWeaponItemImg;
-    [SerializeField]
-    Image playerHelmetImg;
-    [SerializeField]
-    SpriteRenderer helmetItemImg;
-    [SerializeField]
-    Image playerArmorImg;
-    [SerializeField]
-    SpriteRenderer armorItemImg;
-    [SerializeField]
-    Image playerLeftFantsImg;
-    [SerializeField]
-    Image playerRightFantsImg;
-    [SerializeField]
-    SpriteRenderer fantsItemImg;
+    [SerializeField] private Image playerHelmetImg;
 
-    public Image playerLeftImg;
-    public SpriteRenderer leftWeaponItemImg;
-    public SpriteRenderer leftShildItemImg;
+    [SerializeField] private Image playerArmorImg;
+
+    [SerializeField] private Image playerLeftFantsImg;
+
+    [SerializeField] private Image playerRightFantsImg;
+
+    [SerializeField] private Image playerLeftImg;
+
+    [SerializeField] private Image playerRightImg;
 
     // Update is called once per frame
     void Update()
     {
         if (playerUI.activeSelf)
         {
-            hpbar.value = player.hp / player.maxHp;
+            hpbar.value = player.stat.hp / player.stat.maxHp;
         }
         if (bossUI.activeSelf)
         {
@@ -81,8 +67,10 @@ public class StageUIManager : MonoBehaviour
         {
             loadStatus();
             loadItem();
-            playerstat.text = "HP : " + player.hp + "\n\n" + "SPEED : " + player.speed + "\n\n" + "ATK : " + player.damage + "\n\n" + "SKILL DAMAGE : " + player.skillDamage;
+            playerstat.text = "HP : " + player.stat.hp + "\n\n" + "SPEED : " + player.stat.speed + "\n\n" + "ATK : " + player.stat.damage + "\n\n" + "SKILL DAMAGE : " + player.stat.skillDamage;
         }
+        
+        goldTxt.text = player.Inventory.Gold.ToString();
     }
 
     public void loadBossUI(Stat boss)
@@ -93,56 +81,51 @@ public class StageUIManager : MonoBehaviour
 
     public void loadItem()
     {
-        if (leftWeaponItemImg.sprite || leftShildItemImg.sprite)
+        if (player.equipment[0].image)
         {
             playerLeftImg.enabled = true;
-
-            if (leftWeaponItemImg.sprite)
-                playerLeftImg.sprite = leftWeaponItemImg.sprite;
-            if (leftShildItemImg.sprite)
-                playerLeftImg.sprite = leftShildItemImg.sprite;
-
+            playerLeftImg.sprite = player.equipment[0].image;
             playerLeftImg.SetNativeSize();
         }
         else
             playerLeftImg.enabled = false;
 
-        if (helmetItemImg.sprite)
+        if (player.equipment[1].image)
         {
             playerHelmetImg.enabled = true;
-            playerHelmetImg.sprite = helmetItemImg.sprite;
+            playerHelmetImg.sprite = player.equipment[1].image;
             playerHelmetImg.SetNativeSize();
         }
         else
             playerHelmetImg.enabled = false;
 
-        if (rightWeaponItemImg.sprite)
-        {
-            playerRightImg.enabled = true;
-            playerRightImg.sprite = rightWeaponItemImg.sprite;
-            playerRightImg.SetNativeSize();
-        }
-        else
-            playerRightImg.enabled = false;
-
-        if (armorItemImg.sprite)
+        if (player.equipment[2].image)
         {
             playerArmorImg.enabled = true;
-            playerArmorImg.sprite = armorItemImg.sprite;
+            playerArmorImg.sprite = player.equipment[2].image;
             playerArmorImg.SetNativeSize();
         }
         else
             playerArmorImg.enabled = false;
 
-        if (fantsItemImg.sprite)
+        if (player.equipment[3].image)
         {
             playerRightFantsImg.enabled = playerLeftFantsImg.enabled = true;
-            playerRightFantsImg.sprite = playerLeftFantsImg.sprite = fantsItemImg.sprite;
+            playerRightFantsImg.sprite = playerLeftFantsImg.sprite = player.equipment[3].image;
             playerLeftFantsImg.SetNativeSize();
             playerRightFantsImg.SetNativeSize();
         }
         else
             playerRightFantsImg.enabled = playerLeftFantsImg.enabled = false;
+        
+        if (player.equipment[4].image)
+        {
+            playerRightImg.enabled = true;
+            playerRightImg.sprite = player.equipment[4].image;
+            playerRightImg.SetNativeSize();
+        }
+        else
+            playerRightImg.enabled = false;
     }
 
     public void loadStatus()
