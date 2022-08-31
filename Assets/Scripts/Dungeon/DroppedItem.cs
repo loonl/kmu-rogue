@@ -13,10 +13,6 @@ public class DroppedItem : Interact
     public int _price = 0;
     // private Image _sprite;
 
-    private void Start()
-    {
-        Set(ItemManager.Instance.GetItem(5));
-    }
 
     public void Set(Item item, int price = 0)
     {
