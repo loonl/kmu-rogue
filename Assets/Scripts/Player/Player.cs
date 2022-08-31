@@ -44,10 +44,10 @@ public class Player : MonoBehaviour {
 
         // player's first equipments (플레이어 첫 장비)
         equipment = new List<Item> { ItemManager.Instance.GetItem(0), // weapon
-                                     ItemManager.Instance.GetItem(35), // helmet
-                                     ItemManager.Instance.GetItem(57), // armor
-                                     ItemManager.Instance.GetItem(78), // pants
-                                     ItemManager.Instance.GetItem(94)  // shield
+                                     ItemManager.Instance.GetItem(7), // helmet
+                                     ItemManager.Instance.GetItem(10), // armor
+                                     ItemManager.Instance.GetItem(15), // pants
+                                     ItemManager.Instance.GetItem(1)  // shield
                                     };
 
         List<Stat> temp = new List<Stat>();
@@ -105,6 +105,8 @@ public class Player : MonoBehaviour {
     void Update()
     {
         remainCool -= Time.deltaTime;
+        if (remainCool < -100.0f)
+            remainCool = -1.0f;
 
         // should not work in dead condition
         if (dead)
@@ -174,25 +176,25 @@ public class Player : MonoBehaviour {
 
         // test code - change equipments
         if (Input.GetKeyDown(KeyCode.G)) // helmet
-            Equip(ItemManager.Instance.GetItem(Random.Range(35, 56)));
+            Equip(ItemManager.Instance.GetItem(82));
 
         if (Input.GetKeyDown(KeyCode.H)) // armor
-            Equip(ItemManager.Instance.GetItem(Random.Range(57, 76)));
+            Equip(ItemManager.Instance.GetItem(86));
 
         if (Input.GetKeyDown(KeyCode.J)) // pants
-            Equip(ItemManager.Instance.GetItem(Random.Range(78, 93)));
+            Equip(ItemManager.Instance.GetItem(87));
 
         if (Input.GetKeyDown(KeyCode.K)) // shield
-            Equip(ItemManager.Instance.GetItem(Random.Range(94, 103)));
+            Equip(ItemManager.Instance.GetItem(89));
 
         if (Input.GetKeyDown(KeyCode.B)) // sword
-            Equip(ItemManager.Instance.GetItem(Random.Range(1, 14)));
+            Equip(ItemManager.Instance.GetItem(77));
 
         if (Input.GetKeyDown(KeyCode.N)) // bow
-            Equip(ItemManager.Instance.GetItem(Random.Range(28, 31)));
+            Equip(ItemManager.Instance.GetItem(81));
 
         if (Input.GetKeyDown(KeyCode.M)) // staff
-            Equip(ItemManager.Instance.GetItem(Random.Range(32, 34)));
+            Equip(ItemManager.Instance.GetItem(61));
 
         if (Input.GetKeyDown(KeyCode.P))
         {
