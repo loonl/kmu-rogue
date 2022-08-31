@@ -7,38 +7,23 @@ using TMPro;
 
 public class StageUIManager : MonoBehaviour
 {
-    GameObject playerUI;
-    public Slider hpbar;
-    public float maxHp;
-    public Player curhp;
+    [SerializeField] private GameObject playerUI;
 
-    public GameObject coin;
-    TextMeshProUGUI coinTXT;
-    int curCoin = 0;
+    [SerializeField] private Slider hpbar;
 
-    GameObject bossUI;
-    Slider bossHpbar;
-    float bossMaxHp;
-    Monster curBoss;
+    [SerializeField] private TextMeshProUGUI playerstat;
 
-    GameObject backIMG;
-    GameObject statusFrame;
-    bool openStatus = false;
+    private Player player;
+    private Stat boss;
 
-    // Start is called before the first frame update
-    private void Awake()
-    {
-        backIMG = GameObject.Find("BackPannel");
-        statusFrame = GameObject.Find("StatusFrame");
+    [SerializeField] private GameObject bossUI;
 
-        coinTXT = coin.GetComponent<TextMeshProUGUI>();
+    private Slider bossHpbar;
+    [SerializeField] private TextMeshProUGUI goldTxt;
+    [SerializeField] private GameObject backIMG;
+    [SerializeField] private GameObject statusFrame;
 
-        bossUI = GameObject.Find("BossHp");
-
-        playerUI = GameObject.Find("PlayerHp");
-
-        addCoin(0);
-    }
+    private bool openStatus = false;
     void Start()
     {
         bossHpbar = bossUI.GetComponent<Slider>();
@@ -49,51 +34,112 @@ public class StageUIManager : MonoBehaviour
         bossUI.SetActive(false);
     }
 
+    public void init(Player player)
+    {
+        this.player = player;
+    }
+
+    [SerializeField] private Image playerHelmetImg;
+
+    [SerializeField] private Image playerArmorImg;
+
+    [SerializeField] private Image playerLeftFantsImg;
+
+    [SerializeField] private Image playerRightFantsImg;
+
+    [SerializeField] private Image playerLeftImg;
+
+    [SerializeField] private Image playerRightImg;
+
     // Update is called once per frame
     void Update()
     {
-        if (bossUI.activeSelf)
-        {
-            //bossHpbar.value = curBoss.health / bossMaxHp;
-        }
-
         if (playerUI.activeSelf)
         {
-            //hpbar.value = curhp.health / maxHp;
+            hpbar.value = player.stat.hp / player.stat.maxHp;
         }
-
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (bossUI.activeSelf)
         {
-            openStatus = !openStatus;
-            backIMG.SetActive(openStatus);
-            statusFrame.SetActive(openStatus);
-            if (openStatus)
-            {
-                Time.timeScale = 1;
-            }
-            else
-            {
-                Time.timeScale = 0;
-            }
+            bossHpbar.value = boss.hp / boss.maxHp;
         }
+
+        if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.Escape))
+        {
+            loadStatus();
+            loadItem();
+            playerstat.text = "HP : " + player.stat.hp + "\n\n" + "SPEED : " + player.stat.speed + "\n\n" + "ATK : " + player.stat.damage + "\n\n" + "SKILL DAMAGE : " + player.stat.skillDamage;
+        }
+        
+        goldTxt.text = player.Inventory.Gold.ToString();
     }
 
-    public void RoadBossUI(float maxhp, Monster boss)
+    public void loadBossUI(Stat boss)
     {
-        curBoss = boss.GetComponent<Monster>();
+        this.boss = boss;
         bossUI.SetActive(true);
-        bossMaxHp = maxHp;
-    }
-    public void RoadPlayerUI(float maxPlayerHP, Player player)
-    {
-        curhp = player.GetComponent<Player>();
-        playerUI.SetActive(true);
-        maxHp = maxPlayerHP;
     }
 
-    public void addCoin(int coin)
+    public void loadItem()
     {
-        curCoin += coin;
-        coinTXT.text = curCoin.ToString();
+        if (player.equipment[0].image)
+        {
+            playerLeftImg.enabled = true;
+            playerLeftImg.sprite = player.equipment[0].image;
+            playerLeftImg.SetNativeSize();
+        }
+        else
+            playerLeftImg.enabled = false;
+
+        if (player.equipment[1].image)
+        {
+            playerHelmetImg.enabled = true;
+            playerHelmetImg.sprite = player.equipment[1].image;
+            playerHelmetImg.SetNativeSize();
+        }
+        else
+            playerHelmetImg.enabled = false;
+
+        if (player.equipment[2].image)
+        {
+            playerArmorImg.enabled = true;
+            playerArmorImg.sprite = player.equipment[2].image;
+            playerArmorImg.SetNativeSize();
+        }
+        else
+            playerArmorImg.enabled = false;
+
+        if (player.equipment[3].image)
+        {
+            playerRightFantsImg.enabled = playerLeftFantsImg.enabled = true;
+            playerRightFantsImg.sprite = playerLeftFantsImg.sprite = player.equipment[3].image;
+            playerLeftFantsImg.SetNativeSize();
+            playerRightFantsImg.SetNativeSize();
+        }
+        else
+            playerRightFantsImg.enabled = playerLeftFantsImg.enabled = false;
+        
+        if (player.equipment[4].image)
+        {
+            playerRightImg.enabled = true;
+            playerRightImg.sprite = player.equipment[4].image;
+            playerRightImg.SetNativeSize();
+        }
+        else
+            playerRightImg.enabled = false;
+    }
+
+    public void loadStatus()
+    {
+        openStatus = !openStatus;
+        backIMG.SetActive(openStatus);
+        statusFrame.SetActive(openStatus);
+        if (openStatus)
+        {
+            Time.timeScale = 0;
+        }
+        else
+        {
+            Time.timeScale = 1;
+        }
     }
 }

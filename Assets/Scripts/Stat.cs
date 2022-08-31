@@ -92,5 +92,21 @@ public class Stat
         hp = Mathf.Clamp(hp + amount, 0, maxHp);
     }
 
+    public static bool operator ==(Stat a, Stat b)
+    {
+        if (a.hp == b.hp && a.maxHp == b.maxHp && a.damage == b.damage &&
+            a.range == b.range && a.skillDamage == b.skillDamage && a.coolTime == b.coolTime &&
+            a.speed == b.speed)
+            return true;
+        return false;
+    }
 
+    public static bool operator !=(Stat a, Stat b)
+    {
+        if (a.hp == b.hp && a.maxHp == b.maxHp && a.damage == b.damage &&
+    a.range == b.range && a.skillDamage == b.skillDamage && a.coolTime == b.coolTime &&
+    a.speed == b.speed)
+            return false;
+        return true;
+    }
 }
