@@ -149,16 +149,21 @@ public class DungeonSystem : MonoBehaviour
         for (int i = -2; i < 3; i++)
         {
             // DroppedItem 생성
-            GameObject dropped = GameManager.Instance.CreateGo
+            GameObject dropped = GameManager.Instance.CreateGO
             (
-                "Prefabs/Dungeon/DroppedItem", 
+                "Prefabs/Dungeon/Dropped", 
                 generator.Shop.transform
             );
 
-            dropped.transform.position = new Vector3(i, 0, 0);
+            dropped.transform.position = new Vector3
+            (
+                i + generator.Shop.transform.position.x,
+                generator.Shop.transform.position.y, 
+                -1f
+            );
             // !!! 아이템 가격 표 필요 (아이템 가격 1000 고정)
             Item randomItem = GameManager.Instance.GetRandomDropItem();
-            dropped.GetComponent<DroppedItem>().Set(randomItem, 1000);
+            dropped.GetComponent<DroppedItem>().Set(randomItem, 0);
         }
     }
 }
