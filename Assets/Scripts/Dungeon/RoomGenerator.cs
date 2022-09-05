@@ -111,7 +111,8 @@ public class RoomGenerator : MonoBehaviour
 
     private int shopIndex;
 
-    public DungeonRoom Shop { get { return dungeonRooms[shopIndex]; } }
+    public DungeonRoom Shop { get { return dungeonRooms[shopIndex]; } private set { value = dungeonRooms[shopIndex]; } }
+    public int ShopIndex { get { return shopIndex; } }
 
     private void Awake()
     {
