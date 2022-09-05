@@ -112,6 +112,7 @@ public class RoomGenerator : MonoBehaviour
     private int shopIndex;
 
     public DungeonRoom Shop { get { return dungeonRooms[shopIndex]; } }
+    public int ShopIndex { get { return shopIndex; } }
 
     private void Awake()
     {
@@ -145,6 +146,7 @@ public class RoomGenerator : MonoBehaviour
         }
 
         DrawRoom(rooms[shopIndex], type, RoomSize.Small);           // Shop
+        this.Shop = rooms[shopIndex];
 
         foreach (DungeonRoom room in rooms[(shopIndex+1)..(rooms.Length - 1)])
         {

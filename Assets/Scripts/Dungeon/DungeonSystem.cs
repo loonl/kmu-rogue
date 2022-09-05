@@ -84,6 +84,12 @@ public class DungeonSystem : MonoBehaviour
         for (int roomIndex = 1; roomIndex < generator.Rooms.Count; roomIndex++) // 0번 방에는 스포너를 안만듬
         // foreach (DungeonRoom room in generator.Rooms)
         {
+            if (generator.ShopIndex == roomIndex)
+            {
+                // 상점에서는 스포너 생성 X
+                continue;
+            }
+
             if (roomIndex == generator.Rooms.Count - 1)
             {
                 boss = true;
@@ -138,9 +144,21 @@ public class DungeonSystem : MonoBehaviour
     // -------------------------------------------------------------
     private void CreateShop()
     {
-        DungeonRoom shop = generator.Shop;
-        
-        // DroppedItem 생성
-        // GameManager.Instance.CreateGo("Prefabs/Dungeon/DroppedItem", shop.transform);
+        // 아이템 5개 일렬 배치
+        // !!! 중복 아이템에 대한 처리 X
+        for (int i = -2; i < 3; i++)
+        {
+            // DroppedItem 생성
+            GameObject dropped = GameManager.Instance.CreateGo
+            (
+                "Prefabs/Dungeon/DroppedItem", 
+                generator.Shop.transform
+            );
+
+            dropped.transform.position = new Vector3(i, 0, 0);
+            // !!! 아이템 가격 표 필요 (아이템 가격 1000 고정)
+            Item randomItem = GameManager.Instance.GetRandomDropItem();
+            dropped.GetComponent<DroppedItem>().Set(randomItem, 1000);
+        }
     }
 }
