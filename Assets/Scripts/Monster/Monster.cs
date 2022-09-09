@@ -31,7 +31,8 @@ public class Monster: MonoBehaviour
     protected Player player; // 추적 대상
     protected Vector2 direction; // 경로 방향
 
-    public event Action onEliminate; // 시체제거 시 발동 이벤트
+    public event Action onDie; // 사망 시 발동 이벤트
+    public event Action onRevive; // 부활 시 발동 이벤트
     // 추적 대상의 존재 여부
     protected bool hasTarget
     {
@@ -52,9 +53,10 @@ public class Monster: MonoBehaviour
         rigidbody2d = GetComponent<Rigidbody2D>();
         animator = GetComponentInChildren<Animator>();
         audioPlayer = GetComponent<AudioSource>();
-
-        
+        capsuleCollider2d = GetComponent<CapsuleCollider2D>();
+        circleCollider2d = GetComponent<CircleCollider2D>();
     }
+
     protected void Start()
     {
         SetUp(); // 몬스터 초기화
@@ -78,6 +80,8 @@ public class Monster: MonoBehaviour
         corpseHealth = maxHealth / 2;
         dead = false;
         action = "moving";
+        capsuleCollider2d.enabled = true;
+        circleCollider2d.enabled = true;
         StartCoroutine(UpdatePath());
         StartCoroutine(Moving());
     }
@@ -126,7 +130,6 @@ public class Monster: MonoBehaviour
     {
         while (dead)
         {
-            rigidbody2d.velocity = Vector2.zero;
             yield return new WaitForSeconds(0.05f);
         }
     }
@@ -138,14 +141,7 @@ public class Monster: MonoBehaviour
 
         if (health <= 0)
         {
-            if (!dead)
-            {
-                Die();
-            }
-            else
-            {
-                Eliminate();
-            }
+            Die();
         }
 
         //audioPlayer.PlayOneShot(hitSound);
@@ -156,23 +152,29 @@ public class Monster: MonoBehaviour
     // 사망 시 실행
     public virtual void Die()
     {
+        onDie();
+
         dead = true;
         health = corpseHealth;
+        capsuleCollider2d.enabled = false;
+        circleCollider2d.enabled = false;
+        DropGold();
         StartCoroutine(Dying());
 
         animator.SetTrigger("Die");
         //audioPlayer.PlayOneShot(deathSound);
     }
 
-    // 시체제거 시 실행
-    protected void Eliminate()
-    {
-        if (onEliminate != null)
-        {
-            onEliminate();
-        }
-        DropGold();
-    }
+    // !! 사용안함
+    // 시체제거 시 실행 
+    //protected void Eliminate()
+    //{
+    //    if (onEliminate != null)
+    //    {
+    //        onEliminate();
+    //    }
+    //    DropGold();
+    //}
 
     // 소지금에 골드 추가
     public void DropGold()
@@ -183,7 +185,10 @@ public class Monster: MonoBehaviour
     // 부활 시 실행
     public void Revive()
     {
+        onRevive();
+
         maxHealth = (float)Math.Ceiling(maxHealth * 2 / 3);
+        gold = 0;
         Generate();
 
         animator.SetTrigger("Revive");
