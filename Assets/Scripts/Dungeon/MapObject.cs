@@ -10,7 +10,8 @@ public class MapObject : MonoBehaviour
 
         GameObject droppedItem;
 
-        if (false)  // 아이템 확률
+        float itemPercent = 0.5f;
+        if (Random.Range(0f, 1f) <= itemPercent)  // 아이템 확률
         {
             droppedItem = GameManager.Instance.CreateGO
             (
@@ -19,9 +20,8 @@ public class MapObject : MonoBehaviour
             );
 
             // 드랍 확률에 따라 아이템 할당
-            // Item item = GameManager.Instance.GetRandomDropItem();
-            //droppedItem.GetComponent<DroppedItem>().Set(item);
-
+            Item item = GameManager.Instance.GetRandomDropItem();
+            droppedItem.GetComponent<DroppedItem>().Set(item);
         }
         else
         {
