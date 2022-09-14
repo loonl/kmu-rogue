@@ -7,8 +7,6 @@ using TMPro;
 public class Inventory : MonoBehaviour
 {
     private int gold = 0;
-    [SerializeField]
-    TextMeshProUGUI coinTXT;
     public int Gold { get { return gold; } }
     // -------------------------------------------------------------
     // 골드
@@ -18,7 +16,6 @@ public class Inventory : MonoBehaviour
     {
         gold += diff;
         Debug.Log($"Update gold: {gold}");      // !!! TEMP
-        coinTXT.text = gold.ToString();
         // UIManager.Instance.UpdateGoldText(gold);
     }
 }

@@ -52,7 +52,7 @@ public class DungeonSystem : MonoBehaviour
 
         // 맵 생성
         generator.Generate(tempRoomCount, tileSeqence[(Floor - 1) % 4]);
-        CreateSpawners(Floor);   // 스포너 생성
+        CreateMonsterSpawner();   // 스포너 생성
         CreateShop();       // 상점 생성
     }
 
@@ -65,25 +65,42 @@ public class DungeonSystem : MonoBehaviour
     // -------------------------------------------------------------
     // 스포너 생성
     // -------------------------------------------------------------
-    private void CreateSpawners(int floor)
+    private void CreateMonsterSpawner()
     {
         List<Dictionary<string, object>> monsterSpawnerData = CSVReader.Read("Datas/MonsterSpawner");
         List<Dictionary<string, object>> monsterData = CSVReader.Read("Datas/Monster");
 
-        List<float> monsterProbList = new List<float>();
+        // 스포너 확률 리스트 생성
+        List<float> monsterSpawnerProbList = new List<float>();
         for (int i = 0; i < monsterSpawnerData.Count; i++)
         {
-            if(floor == int.Parse(monsterSpawnerData[i]["Floor"].ToString()))
+            if(Floor == int.Parse(monsterSpawnerData[i]["Floor"].ToString()))
             {
-                monsterProbList.Add(float.Parse(monsterSpawnerData[i]["Prob"].ToString()));
+                monsterSpawnerProbList.Add(float.Parse(monsterSpawnerData[i]["Prob"].ToString()));
             }
         }
 
-        for (int roomIndex = 1; roomIndex < generator.Rooms.Count; roomIndex++)
+        bool boss;
+        for (int roomIndex = 1; roomIndex < generator.Rooms.Count; roomIndex++) // 0번 방에는 스포너를 안만듬
         // foreach (DungeonRoom room in generator.Rooms)
         {
-            // 0번 방에는 스포너를 안만듬
-            int MonsterSpawnerId = RandomSelect(monsterProbList);
+            if (generator.ShopIndex == roomIndex)
+            {
+                // 상점에서는 스포너 생성 X
+                continue;
+            }
+
+            if (roomIndex == generator.Rooms.Count - 1)
+            {
+                boss = true;
+            }
+            else
+            {
+                boss = false;
+            }
+
+            int MonsterSpawnerId = RandomSelect(monsterSpawnerProbList, boss);
+            Debug.Log(MonsterSpawnerId);
             string MonsterSpawnerPath = monsterSpawnerData[MonsterSpawnerId]["Path"].ToString();
 
             GameObject goSpawner = GameManager.Instance.CreateGO(MonsterSpawnerPath, generator.Rooms[roomIndex].transform);
@@ -92,18 +109,21 @@ public class DungeonSystem : MonoBehaviour
         }
     }
 
-    // csv파일에 기재된 확률에 의거해 무작위로 몬스터 선택
-    int RandomSelect(List<float> list)
+    // csv파일에 기재된 확률에 의거해 무작위로 스포너 선택
+    int RandomSelect(List<float> list, bool boss)
     {
-        float total = 0;
+        if (boss)
+        {
+            return list.Count - 1;
+        }
 
+        float total = 0;
         foreach (float elem in list)
         {
             total += elem;
         }
 
         float randomPoint = Random.value * total;
-
         for (int i = 0; i < list.Count; i++)
         {
             if (randomPoint < list[i])
@@ -115,7 +135,8 @@ public class DungeonSystem : MonoBehaviour
                 randomPoint -= list[i];
             }
         }
-        return list.Count - 1;
+
+        return list.Count - 2;
     }
 
     // -------------------------------------------------------------
@@ -123,9 +144,26 @@ public class DungeonSystem : MonoBehaviour
     // -------------------------------------------------------------
     private void CreateShop()
     {
-        DungeonRoom shop = generator.Shop;
-        
-        // DroppedItem 생성
-        // GameManager.Instance.CreateGo("Prefabs/Dungeon/DroppedItem", shop.transform);
+        // 아이템 5개 일렬 배치
+        // !!! 중복 아이템에 대한 처리 X
+        for (int i = -2; i < 3; i++)
+        {
+            // DroppedItem 생성
+            GameObject dropped = GameManager.Instance.CreateGO
+            (
+                "Prefabs/Dungeon/Dropped", 
+                generator.Shop.transform
+            );
+
+            dropped.transform.position = new Vector3
+            (
+                i + generator.Shop.transform.position.x,
+                generator.Shop.transform.position.y, 
+                -1f
+            );
+            // !!! 아이템 가격 표 필요 (아이템 가격 1000 고정)
+            Item randomItem = GameManager.Instance.GetRandomDropItem();
+            dropped.GetComponent<DroppedItem>().Set(randomItem, 0);
+        }
     }
 }
