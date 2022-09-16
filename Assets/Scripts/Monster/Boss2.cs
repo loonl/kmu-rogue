@@ -10,7 +10,7 @@ public class Boss2 : Monster
     protected override IEnumerator Moving()
     {
         lastSkillTime = Time.time;
-        while (!dead && hasTarget && action == "moving")
+        while (!dead && hasTarget && action == Action.Moving)
         {
             rigidbody2d.velocity = direction * speed;
             if (Time.time >= lastSkillTime + timeBetSkill)

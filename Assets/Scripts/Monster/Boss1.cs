@@ -4,8 +4,8 @@ using UnityEngine;
 public class Boss1 : RushZombie
 {
     int rushStep = 0;
-    // 돌진 상태 수행
-    protected override IEnumerator Rushing()
+    // 스킬 수행
+    protected override IEnumerator SkillCasting()
     {
         bool rushing = true;
         bool rushReady = true;
@@ -45,7 +45,7 @@ public class Boss1 : RushZombie
             yield return new WaitForSeconds(0.05f);
         }
 
-        action = "moving";
+        action = Action.Moving;
         StartCoroutine(Moving());
     }
 }
