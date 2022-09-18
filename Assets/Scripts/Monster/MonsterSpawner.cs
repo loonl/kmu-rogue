@@ -5,7 +5,8 @@ public class MonsterSpawner : MonoBehaviour
 {
     private List<Dictionary<string, object>> monsterData; // 몬스터 데이터
     public List<Monster> SetupMonsters = new List<Monster>(); // 생성할 몬스터들
-    public List<Monster> monsters = new List<Monster>(); // 남은 몬스터들
+    public List<Monster> monsters = new List<Monster>(); // 생존한 몬스터들
+    public List<Monster> deadMonsters = new List<Monster>(); // 생존한 몬스터들
 
     private int roomIndex; // 방 번호
     private Vector3 roomPosition; // 방 위치
@@ -37,11 +38,16 @@ public class MonsterSpawner : MonoBehaviour
             monster.transform.position = roomPosition + diff;
 
             monsters.Add(monster);
-            monster.onEliminate += () =>
+            monster.onDie += () =>
             {
-                Destroy(monster.gameObject);
                 monsters.Remove(monster);
+                deadMonsters.Add(monster);
                 CheckRemainEnemy();
+            };
+            monster.onRevive += () =>
+            {
+                deadMonsters.Remove(monster);
+                monsters.Add(monster);
             };
         }
     }

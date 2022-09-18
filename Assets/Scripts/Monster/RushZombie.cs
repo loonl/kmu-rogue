@@ -8,8 +8,8 @@ public class RushZombie : Monster
     protected float lastRushTime = -4f; // 마지막 돌진 시점
     protected float timeForRushReady = 1f; // 돌진 준비시간
 
-    // 돌진 상태 수행
-    protected virtual IEnumerator Rushing()
+    // 스킬 수행
+    protected virtual IEnumerator SkillCasting()
     {
         bool rushing = true;
         bool rushReady = true;
@@ -36,7 +36,7 @@ public class RushZombie : Monster
             yield return new WaitForSeconds(0.05f);
         }
 
-        action = "moving";
+        action = Action.Moving;
         StartCoroutine(Moving());
     }
 
@@ -55,8 +55,8 @@ public class RushZombie : Monster
             if (player == attackTarget)
             {
                 lastRushTime = Time.time;
-                action = "rushing";
-                StartCoroutine(Rushing());
+                action = Action.SkillCasting;
+                StartCoroutine(SkillCasting());
             }
         }
     }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Monster: MonoBehaviour
+public class Monster : MonoBehaviour
 {
     protected Animator animator;
     protected AudioSource audioPlayer;
@@ -25,13 +25,26 @@ public class Monster: MonoBehaviour
     protected float speed; // 이동 속도
     protected float attackCoolTime = 0.5f; // 공격 쿨타임
     protected float lastAttackTime; // 마지막 공격 시점
+    //protected float timeForDamaging = 0.75f;
+    //protected float lastDamagedTime;
 
+
+    // 행동 목록
+    public enum Action
+    {
+        Standing, // 휴식 중
+        Moving, // 이동 중
+        SkillCasting, // 스킬 캐스팅 중
+        OnDamaging // 피격 중
+    }
+    protected Action action; // 현재 상태
+    protected Coroutine onDamageCoroutine = null;
     public bool dead = false; // 사망 상태
-    protected string action; // 현재 수행 중인 상태
     protected Player player; // 추적 대상
     protected Vector2 direction; // 경로 방향
 
-    public event Action onEliminate; // 시체제거 시 발동 이벤트
+    public event System.Action onDie; // 사망 시 발동 이벤트
+    public event System.Action onRevive; // 부활 시 발동 이벤트
     // 추적 대상의 존재 여부
     protected bool hasTarget
     {
@@ -52,9 +65,10 @@ public class Monster: MonoBehaviour
         rigidbody2d = GetComponent<Rigidbody2D>();
         animator = GetComponentInChildren<Animator>();
         audioPlayer = GetComponent<AudioSource>();
-
-        
+        capsuleCollider2d = GetComponent<CapsuleCollider2D>();
+        circleCollider2d = GetComponent<CircleCollider2D>();
     }
+
     protected void Start()
     {
         SetUp(); // 몬스터 초기화
@@ -77,7 +91,9 @@ public class Monster: MonoBehaviour
         health = maxHealth;
         corpseHealth = maxHealth / 2;
         dead = false;
-        action = "moving";
+        action = Action.Moving;
+        capsuleCollider2d.enabled = true;
+        circleCollider2d.enabled = true;
         StartCoroutine(UpdatePath());
         StartCoroutine(Moving());
     }
@@ -90,65 +106,89 @@ public class Monster: MonoBehaviour
             if (hasTarget)
             {
                 direction = (player.transform.position - transform.position).normalized;
-
-                if (direction.x > 0)
-                {
-                    transform.localScale = new Vector3(-scale, scale, 1);
-                }
-                else
-                {
-                    transform.localScale = new Vector3(scale, scale, 1);
-                }
             }
-            else 
+            else
             {
                 player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
             }
 
             animator.SetBool("HasTarget", hasTarget);
-            yield return new WaitForSeconds(0.1f);
-        }
-    }
-
-    // 이동 상태 수행
-    protected virtual IEnumerator Moving()
-    {
-        while (!dead && hasTarget && action == "moving")
-        {
-            rigidbody2d.velocity = direction * speed;
             yield return new WaitForSeconds(0.05f);
         }
-        rigidbody2d.velocity = Vector2.zero;
     }
 
-    // 시체 상태 수행
+    // 이동 수행
+    protected virtual IEnumerator Moving()
+    {
+        while (!dead && hasTarget && action == Action.Moving)
+        {
+            rigidbody2d.velocity = direction * speed;
+
+            if (direction.x > 0)
+            {
+                transform.localScale = new Vector3(-scale, scale, 1);
+            }
+            else
+            {
+                transform.localScale = new Vector3(scale, scale, 1);
+            }
+            yield return new WaitForSeconds(0.05f);
+        }
+    }
+
+    // 피격 수행
+    protected virtual IEnumerator OnDamaging(float knockBackForce, Vector2 diff)
+    {
+        rigidbody2d.velocity = Vector2.zero;
+        rigidbody2d.AddForce(diff * knockBackForce, ForceMode2D.Impulse);
+        Vector2 startWay = rigidbody2d.velocity;
+        Debug.Log(rigidbody2d.velocity.x);
+
+        while ((startWay.x > 0 && rigidbody2d.velocity.x > 0) || (startWay.x < 0 && rigidbody2d.velocity.x < 0)
+            && (startWay.y > 0 && rigidbody2d.velocity.y > 0) || (startWay.y < 0 && rigidbody2d.velocity.y < 0))
+        {
+            rigidbody2d.AddForce(-diff * knockBackForce * 7f, ForceMode2D.Force);
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        rigidbody2d.velocity = Vector2.zero;
+        action = Action.Moving;
+        StartCoroutine(Moving());
+    }
+
+    // 시체 수행
     protected virtual IEnumerator Dying()
     {
         while (dead)
         {
-            rigidbody2d.velocity = Vector2.zero;
             yield return new WaitForSeconds(0.05f);
         }
     }
 
     // 피격 시 실행
-    public void OnDamage(float damage)
+    public void OnDamage(float damage, float knockBackForce, Vector2 diff)
     {
+
         health -= damage;
 
         if (health <= 0)
         {
-            if (!dead)
-            {
-                Die();
-            }
-            else
-            {
-                Eliminate();
-            }
+            Die();
+        }
+        else
+        {
+            //audioPlayer.PlayOneShot(hitSound);
         }
 
-        //audioPlayer.PlayOneShot(hitSound);
+        if (action == Action.Moving || action == Action.OnDamaging)
+        {
+            action = Action.OnDamaging;
+            if (onDamageCoroutine != null)
+            {
+                StopCoroutine(onDamageCoroutine);
+            }
+            onDamageCoroutine = StartCoroutine(OnDamaging(knockBackForce, diff));
+        }
 
         Debug.Log("Monster Health: " + health);
     }
@@ -156,22 +196,17 @@ public class Monster: MonoBehaviour
     // 사망 시 실행
     public virtual void Die()
     {
+        onDie();
+
         dead = true;
         health = corpseHealth;
+        capsuleCollider2d.enabled = false;
+        circleCollider2d.enabled = false;
+        DropGold();
         StartCoroutine(Dying());
 
         animator.SetTrigger("Die");
         //audioPlayer.PlayOneShot(deathSound);
-    }
-
-    // 시체제거 시 실행
-    protected void Eliminate()
-    {
-        if (onEliminate != null)
-        {
-            onEliminate();
-        }
-        DropGold();
     }
 
     // 소지금에 골드 추가
@@ -183,7 +218,9 @@ public class Monster: MonoBehaviour
     // 부활 시 실행
     public void Revive()
     {
-        maxHealth = (float)Math.Ceiling(maxHealth * 2 / 3);
+        onRevive();
+
+        gold = 0;
         Generate();
 
         animator.SetTrigger("Revive");
@@ -201,7 +238,7 @@ public class Monster: MonoBehaviour
         {
             Player attackTarget = other.gameObject.GetComponent<Player>();
 
-            if (attackTarget != null && attackTarget == player)
+            if (attackTarget == player)
             {
                 lastAttackTime = Time.time;
                 attackTarget.OnDamage(damage);

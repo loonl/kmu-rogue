@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8b142df9-bd60-4850-a8cb-c9874a9d9fdf" name="변경" comment="" />
+    <list default="true" id="8b142df9-bd60-4850-a8cb-c9874a9d9fdf" name="변경" comment="">
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/MapTest.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/MapTest.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/MonsterTest.unity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/MonsterTest.unity.meta" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,6 +41,7 @@
       <workItem from="1661947358169" duration="43000" />
       <workItem from="1661947417148" duration="9000" />
       <workItem from="1661947457118" duration="8000" />
+      <workItem from="1662380540152" duration="178000" />
     </task>
     <servers />
   </component>
