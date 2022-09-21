@@ -110,15 +110,18 @@ public class RoomGenerator : MonoBehaviour
     public List<DungeonRoom> Rooms { get { return dungeonRooms; } }
 
     private int shopIndex;
+    private int bossIndex;
 
     public DungeonRoom Shop { get { return dungeonRooms[shopIndex]; } private set { value = dungeonRooms[shopIndex]; } }
     public int ShopIndex { get { return shopIndex; } }
+    public int BossIndex { get { return bossIndex; } }
 
     private void Awake()
     {
         // default
         roomCount = 0;
         shopIndex = 0;
+        bossIndex = 0;
         roomWidth = 20;
         rooms = new List<Room>();
         visitedRooms = new Stack<Room>();
@@ -131,6 +134,8 @@ public class RoomGenerator : MonoBehaviour
     public void Generate(int maxCount, TileType type)
     {
         shopIndex = Mathf.FloorToInt(maxCount / 2f);
+        bossIndex = Mathf.FloorToInt(maxCount - 1);
+        Debug.Log(shopIndex);
 
         // 빈 방 생성
         CreateEmptyRoom(maxCount);
